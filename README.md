@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:12:54
+自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:14:36
 
 ## Skills
 
@@ -8,15 +8,18 @@
 **描述：** 本地skill创建后自动上传到GitHub的自动化工具
 
 **使用方法：**
-### Python 版本（推荐）
+**Python 版本（推荐）**
+
 **安装依赖：**
 ```bash
 pip install -r C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/requirements.txt
 ```
+
 **启动同步服务（daemon模式）：**
 ```bash
 python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py --daemon
 ```
+
 **手动同步所有skills：**
 ```bash
 python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py

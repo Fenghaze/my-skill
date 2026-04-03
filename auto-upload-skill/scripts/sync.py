@@ -214,10 +214,17 @@ def extract_section(content, section_name):
             # 遇到同级或更高级标题时结束（## 开头的标题）
             if line.startswith('## ') and not line.startswith('###'):
                 break
-            # 跳过空行
+            # 跳过开头和结尾的空行
             if not line.strip():
-                continue
-            section_lines.append(line.lstrip())
+                if not section_lines:
+                    continue
+                section_lines.append(line)
+            else:
+                section_lines.append(line.lstrip())
+
+    # 移除结尾的空行
+    while section_lines and not section_lines[-1].strip():
+        section_lines.pop()
 
     return '\n'.join(section_lines)
 
@@ -249,8 +256,18 @@ def generate_readme(skills):
             # 提取 ## 使用时机 或 ## 使用方法 部分
             usage = extract_section(content, '使用')
             if usage:
+                # 将 ### 子标题降级为普通文本（加粗）
+                usage_lines = []
+                for line in usage.split('\n'):
+                    if line.startswith('### '):
+                        usage_lines.append(f"**{line[4:]}**")
+                    elif line.startswith('**') and not line.startswith('**安装') and not line.startswith('**启动') and not line.startswith('**手动'):
+                        usage_lines.append(line)
+                    else:
+                        usage_lines.append(line)
+
                 skills_lines.append("**使用方法：**")
-                skills_lines.append(usage)
+                skills_lines.extend(usage_lines)
 
         skills_lines.append("")
 
