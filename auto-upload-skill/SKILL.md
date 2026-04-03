@@ -1,7 +1,7 @@
 ---
 name: auto-upload-skill
 description: 本地skill创建后自动上传到GitHub的自动化工具
-version: 1.0.0
+version: 1.1.0
 author: fenghaze
 ---
 
@@ -13,6 +13,7 @@ author: fenghaze
 
 - 文件监视：持续监控 `~/.claude/skills/` 目录变化
 - 自动同步：检测到新的或修改的skill时，自动Git add/commit/push
+- **自动生成README**：每次同步后自动更新仓库README，包含所有skills的描述和使用方法
 - 后台运行：daemon模式在后台持续运行
 
 ## 使用方法
@@ -55,8 +56,18 @@ node C:/Users/Administrator/.claude/skill-sync/daemon.js
 1. daemon使用chokidar监视 `~/.claude/skills/*/SKILL.md` 文件
 2. 检测到变化后，等待5秒防抖
 3. 将变化的skill复制到本地git仓库
-4. 执行 git add → commit → push
-5. 更新同步记录
+4. **解析所有skill的SKILL.md，生成/更新README.md**（包含表格和详细文档）
+5. 执行 git add → commit → push
+6. 更新同步记录
+
+## README自动生成内容
+
+每次同步后，仓库的README.md会自动更新：
+
+- **头部信息**：仓库名、最后更新时间、GitHub链接
+- **Skills表格**：所有skill的名称、描述、版本、作者
+- **Quick Start**：安装指南和常用命令
+- **Individual Skill Docs**：每个skill的详细文档预览（前30行）
 
 ## 验证同步成功
 
