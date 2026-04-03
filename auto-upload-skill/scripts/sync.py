@@ -203,18 +203,16 @@ def extract_section(content, section_name):
     lines = content.split('\n')
     section_lines = []
     in_section = False
-    section_indent = 0
 
     for i, line in enumerate(lines):
         # 匹配section标题
         if line.startswith('## ') and section_name in line:
             in_section = True
-            section_indent = 0
             continue
 
         if in_section:
-            # 遇到同级或更高级标题时结束
-            if line.startswith('#') and not line.startswith('###'):
+            # 遇到同级或更高级标题时结束（## 开头的标题）
+            if line.startswith('## ') and not line.startswith('###'):
                 break
             # 跳过空行
             if not line.strip():
