@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:17:53
+自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:18:46
 
 ## Skills
 
@@ -37,6 +37,52 @@ python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py
 ### find-skill
 **描述：** 帮助用户发现和安装AI Agent技能的工具。当用户询问"有没有能做X的技能"、"怎么实现X功能"或希望扩展Agent能力时自动触发。支持搜索skills.sh上的公开技能库。
 
+**使用方法：**
+当用户询问以下内容时自动触发：
+
+- "有没有能做X的技能"
+- "怎么实现X功能"
+- "有没有X的skill"
+- "能帮我做X吗"
+- 希望扩展Agent能力时
+
+
+**常用命令**
+
+```bash
+# 搜索技能
+npx skills find [关键词]
+
+# 安装技能
+npx skills add <package>
+
+# 查看已安装技能
+npx skills check
+
+# 更新所有技能
+npx skills update
+```
+
+**使用流程**
+
+1. **理解需求**：确定用户需要的技能领域（如React、测试、部署等）
+2. **搜索技能**：使用 `npx skills find [关键词]` 搜索
+3. **验证质量**：检查安装量（优先选1K+）、来源（官方优先）
+4. **推荐用户**：提供技能名称、功能说明、安装命令
+5. **协助安装**：用户同意后执行安装命令
+
+**常用搜索示例**
+
+| 用户需求 | 搜索命令 |
+|---------|---------|
+| React性能优化 | `npx skills find react performance` |
+| PR代码审查 | `npx skills find pr review` |
+| 自动化部署 | `npx skills find deploy ci-cd` |
+| 编写测试 | `npx skills find testing jest` |
+
+**技能库**
+
+浏览更多技能：https://skills.sh/
 
 ### knowledge-review-skill
 **描述：** 当用户希望回顾刚实现的功能、总结学习要点、分析设计思路或代码实现时触发。适用于'/review'、'帮我总结这个功能'、'讲解一下这段代码'、'回顾一下'等请求。此技能会根据用户对相关知识点的掌握程度定制化总结内容。
