@@ -158,6 +158,43 @@ def parse_skill_md(content):
     return info
 
 
+# 排除的文件模式
+EXCLUDE_PATTERNS = {
+    # 日志文件
+    '.log', '*.log',
+    # 敏感信息
+    '.env', '.env.*', 'credentials.json', '*.pem', '*.key', '*.p12', '*.pfx',
+    'id_rsa', 'id_rsa.*', '*.secret', '*.token',
+    # 临时文件
+    '.tmp', '*.tmp', '.cache', '__pycache__', '*.pyc',
+    # 系统文件
+    '.DS_Store', 'Thumbs.db', 'desktop.ini',
+    # IDE配置（可选）
+    '.vscode', '.idea',
+}
+
+def is_excluded(path):
+    """检查路径是否应该被排除"""
+    name = os.path.basename(path)
+
+    for pattern in EXCLUDE_PATTERNS:
+        if pattern.startswith('*'):
+            # 通配符匹配
+            if name.endswith(pattern[1:]):
+                return True
+        elif name == pattern or name.startswith(pattern):
+            return True
+
+    # 检查路径中是否包含敏感关键词
+    sensitive_keywords = ['password', 'secret', 'token', 'credential', 'private', 'api_key']
+    path_lower = path.lower()
+    for keyword in sensitive_keywords:
+        if keyword in path_lower:
+            return True
+
+    return False
+
+
 def copy_skill_to_repo(skill_name):
     """复制skill到git仓库"""
     skills_dir = Path(CONFIG["skillsDir"])
@@ -174,8 +211,25 @@ def copy_skill_to_repo(skill_name):
     if dst.exists():
         shutil.rmtree(dst)
 
-    # 复制新版本
-    shutil.copytree(src, dst)
+    # 复制新版本（排除敏感文件）
+    os.makedirs(dst)
+
+    for root, dirs, files in os.walk(src):
+        # 排除目录
+        dirs[:] = [d for d in dirs if not is_excluded(os.path.join(root, d))]
+
+        for file in files:
+            src_file = os.path.join(root, file)
+            rel_path = os.path.relpath(src_file, src)
+
+            if is_excluded(src_file):
+                logger.info(f"Skipping excluded file: {skill_name}/{rel_path}")
+                continue
+
+            dst_file = os.path.join(dst, rel_path)
+            os.makedirs(os.path.dirname(dst_file), exist_ok=True)
+            shutil.copy2(src_file, dst_file)
+
     logger.info(f"Copied skill '{skill_name}' to repo")
     return True
 
