@@ -18,31 +18,26 @@ author: fenghaze
 
 ## 使用方法
 
-### 启动同步服务
+### Python 版本（推荐）
 
-首次使用需要启动daemon：
-```
-node C:/Users/Administrator/.claude/skill-sync/daemon.js --daemon
-```
-
-建议使用 PM2 或 Windows任务计划程序保持后台运行。
-
-### 查看同步状态
-
-```
-node C:/Users/Administrator/.claude/skill-sync/daemon.js
+**安装依赖：**
+```bash
+pip install -r C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/requirements.txt
 ```
 
-### 手动同步
-
-手动触发所有skills的同步（不使用daemon）：
+**启动同步服务（daemon模式）：**
+```bash
+python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py --daemon
 ```
-node C:/Users/Administrator/.claude/skill-sync/daemon.js
+
+**手动同步所有skills：**
+```bash
+python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py
 ```
 
 ## 配置
 
-配置文件位于：`C:/Users/Administrator/.claude/skill-sync/config.json`
+配置文件位于：`C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/config.json`
 
 | 配置项 | 说明 | 默认值 |
 |--------|------|--------|
@@ -53,7 +48,7 @@ node C:/Users/Administrator/.claude/skill-sync/daemon.js
 
 ## 工作原理
 
-1. daemon使用chokidar监视 `~/.claude/skills/*/SKILL.md` 文件
+1. daemon使用 watchdog 监视 `~/.claude/skills/*/SKILL.md` 文件
 2. 检测到变化后，等待5秒防抖
 3. 将变化的skill复制到本地git仓库
 4. **解析所有skill的SKILL.md，生成/更新README.md**（包含表格和详细文档）
@@ -81,5 +76,5 @@ https://github.com/Fenghaze/my-skill
 - 测试： `ssh -T git@github.com`
 
 **daemon无响应**
-- 检查日志： `C:/Users/Administrator/.claude/skill-sync/sync.log`
+- 检查日志： `C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.log`
 - 重启daemon

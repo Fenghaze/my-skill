@@ -1,0 +1,8 @@
+{
+  "skillsDir": "C:/Users/Administrator/.claude/skills",
+  "repoDir": "C:/Users/Administrator/.claude/skills-sync-repo",
+  "githubRepo": "Fenghaze/my-skill",
+  "branch": "main",
+  "debounceMs": 5000,
+  "logFile": "C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.log"
+}
