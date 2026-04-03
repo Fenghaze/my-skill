@@ -1,6 +1,6 @@
 # my-skill
 
-> Auto-synced from `~/.claude/skills` • Last updated: 2026/4/3 11:05:09
+> Auto-synced from `~/.claude/skills` • Last updated: 2026/4/3 11:05:45
 
 [📦 GitHub](https://github.com/Fenghaze/my-skill)
 
@@ -9,6 +9,28 @@
 ## `auto-upload-skill`
 
 本地skill创建后自动上传到GitHub的自动化工具
+
+### 启动同步服务
+
+首次使用需要启动daemon：
+```
+node C:/Users/Administrator/.claude/skill-sync/daemon.js --daemon
+```
+
+建议使用 PM2 或 Windows任务计划程序保持后台运行。
+
+### 查看同步状态
+
+```
+node C:/Users/Administrator/.claude/skill-sync/daemon.js
+```
+
+### 手动同步
+
+手动触发所有skills的同步（不使用daemon）：
+```
+node C:/Users/Administrator/.claude/skill-sync/daemon.js
+```
 
 ---
 
