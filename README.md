@@ -1,12 +1,13 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:10:56
+自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:12:31
 
 ## Skills
 
 ### auto-upload-skill
-本地skill创建后自动上传到GitHub的自动化工具
-```
+**描述：** 本地skill创建后自动上传到GitHub的自动化工具
+
+**使用方法：**
 ### Python 版本（推荐）
 **安装依赖：**
 ```bash
@@ -20,29 +21,29 @@ python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py -
 ```bash
 python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py
 ```
-```
 
 ### enhance-chat-skill
-增强型规划技能，使用设计树方法论进行严谨的软件设计
-```
+**描述：** 增强型规划技能，使用设计树方法论进行严谨的软件设计
+
+**使用方法：**
 当以下情况时自动触发此技能：
 1. 用户进入规划模式进行软件设计任务
 2. 用户请求功能或系统的实施规划
 3. 用户询问架构设计或系统规划
-```
 
 ### find-skill
-Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
+**描述：** Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
+
 
 ### knowledge-review-skill
-当用户希望回顾刚实现的功能、总结学习要点、分析设计思路或代码实现时触发。适用于'/review'、'帮我总结这个功能'、'讲解一下这段代码'、'回顾一下'等请求。此技能会根据用户对相关知识点的掌握程度定制化总结内容。
-```
+**描述：** 当用户希望回顾刚实现的功能、总结学习要点、分析设计思路或代码实现时触发。适用于'/review'、'帮我总结这个功能'、'讲解一下这段代码'、'回顾一下'等请求。此技能会根据用户对相关知识点的掌握程度定制化总结内容。
+
+**使用方法：**
 当用户请求以下内容时触发：
 - `/review` - 触发知识回顾
 - "帮我总结这个功能"
 - "讲解一下这段代码"
 - "回顾一下今天学的"
-```
 
 
 ---

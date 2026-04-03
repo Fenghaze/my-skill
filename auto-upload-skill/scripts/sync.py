@@ -198,6 +198,32 @@ def sync_all_skills():
     return git_add_commit_push(message)
 
 
+def extract_section(content, section_name):
+    """提取指定section的内容"""
+    lines = content.split('\n')
+    section_lines = []
+    in_section = False
+    section_indent = 0
+
+    for i, line in enumerate(lines):
+        # 匹配section标题
+        if line.startswith('## ') and section_name in line:
+            in_section = True
+            section_indent = 0
+            continue
+
+        if in_section:
+            # 遇到同级或更高级标题时结束
+            if line.startswith('#') and not line.startswith('###'):
+                break
+            # 跳过空行
+            if not line.strip():
+                continue
+            section_lines.append(line.lstrip())
+
+    return '\n'.join(section_lines)
+
+
 def generate_readme(skills):
     """生成仓库README.md"""
     repo_dir = Path(CONFIG["repoDir"])
@@ -214,28 +240,19 @@ def generate_readme(skills):
         version = skill.get('version', '')
 
         skills_lines.append(f"### {name}")
-        skills_lines.append(f"{desc}")
+        skills_lines.append(f"**描述：** {desc}")
+        skills_lines.append("")
 
-        # 读取skill的SKILL.md使用方法部分
+        # 读取skill的SKILL.md
         skill_md_path = Path(skill.get('path', '')) / "SKILL.md"
         if skill_md_path.exists():
             content = skill_md_path.read_text(encoding='utf-8')
-            lines = content.split('\n')
-            # 提取 ## 使用方法 之后的内容
-            in_usage = False
-            usage_lines = []
-            for line in lines:
-                if line.startswith('## 使用'):
-                    in_usage = True
-                    continue
-                if in_usage:
-                    if line.startswith('#') and not line.startswith('###'):
-                        break
-                    usage_lines.append(line)
-            if usage_lines:
-                skills_lines.append("```")
-                skills_lines.extend([l for l in usage_lines if l.strip()])
-                skills_lines.append("```")
+
+            # 提取 ## 使用时机 或 ## 使用方法 部分
+            usage = extract_section(content, '使用')
+            if usage:
+                skills_lines.append("**使用方法：**")
+                skills_lines.append(usage)
 
         skills_lines.append("")
 
