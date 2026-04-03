@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:16:51
+自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:17:53
 
 ## Skills
 
@@ -35,7 +35,7 @@ python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py
 3. 用户询问架构设计或系统规划
 
 ### find-skill
-**描述：** Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
+**描述：** 帮助用户发现和安装AI Agent技能的工具。当用户询问"有没有能做X的技能"、"怎么实现X功能"或希望扩展Agent能力时自动触发。支持搜索skills.sh上的公开技能库。
 
 
 ### knowledge-review-skill

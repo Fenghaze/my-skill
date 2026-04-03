@@ -1,6 +1,6 @@
 ---
 name: find-skills
-description: Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
+description: 帮助用户发现和安装AI Agent技能的工具。当用户询问"有没有能做X的技能"、"怎么实现X功能"或希望扩展Agent能力时自动触发。支持搜索skills.sh上的公开技能库。
 ---
 
 # Find Skills
