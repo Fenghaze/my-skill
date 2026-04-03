@@ -1,6 +1,6 @@
 # my-skill
 
-> Auto-synced from `~/.claude/skills` • Last updated: 2026/4/3 11:40:16
+> Auto-synced from `~/.claude/skills` • Last updated: 2026/4/3 11:40:20
 
 [📦 GitHub](https://github.com/Fenghaze/my-skill)
 
