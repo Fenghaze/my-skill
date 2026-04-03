@@ -283,6 +283,28 @@ def extract_section(content, section_name):
     return '\n'.join(section_lines)
 
 
+def get_usage_content(skill_md_path):
+    """获取skill的使用说明内容"""
+    if not skill_md_path.exists():
+        return ""
+
+    content = skill_md_path.read_text(encoding='utf-8')
+
+    # 先尝试中文"使用"章节
+    usage = extract_section(content, '使用')
+    if usage:
+        return usage
+
+    # 尝试英文"When to Use"章节
+    usage = extract_section(content, 'When to Use')
+    if usage:
+        return usage
+
+    # 尝试"How to"章节
+    usage = extract_section(content, 'How to')
+    return usage
+
+
 def generate_readme(skills):
     """生成仓库README.md"""
     repo_dir = Path(CONFIG["repoDir"])
@@ -304,24 +326,20 @@ def generate_readme(skills):
 
         # 读取skill的SKILL.md
         skill_md_path = Path(skill.get('path', '')) / "SKILL.md"
-        if skill_md_path.exists():
-            content = skill_md_path.read_text(encoding='utf-8')
+        usage = get_usage_content(skill_md_path)
+        if usage:
+            # 将 ### 子标题降级为普通文本（加粗）
+            usage_lines = []
+            for line in usage.split('\n'):
+                if line.startswith('### '):
+                    usage_lines.append(f"**{line[4:]}**")
+                elif line.startswith('**') and not line.startswith('**安装') and not line.startswith('**启动') and not line.startswith('**手动') and not line.startswith('**搜索') and not line.startswith('**查看') and not line.startswith('**更新'):
+                    usage_lines.append(line)
+                else:
+                    usage_lines.append(line)
 
-            # 提取 ## 使用时机 或 ## 使用方法 部分
-            usage = extract_section(content, '使用')
-            if usage:
-                # 将 ### 子标题降级为普通文本（加粗）
-                usage_lines = []
-                for line in usage.split('\n'):
-                    if line.startswith('### '):
-                        usage_lines.append(f"**{line[4:]}**")
-                    elif line.startswith('**') and not line.startswith('**安装') and not line.startswith('**启动') and not line.startswith('**手动'):
-                        usage_lines.append(line)
-                    else:
-                        usage_lines.append(line)
-
-                skills_lines.append("**使用方法：**")
-                skills_lines.extend(usage_lines)
+            skills_lines.append("**使用方法：**")
+            skills_lines.extend(usage_lines)
 
         skills_lines.append("")
 
