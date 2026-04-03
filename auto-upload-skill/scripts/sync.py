@@ -169,8 +169,8 @@ EXCLUDE_PATTERNS = {
     '.tmp', '*.tmp', '.cache', '__pycache__', '*.pyc',
     # 系统文件
     '.DS_Store', 'Thumbs.db', 'desktop.ini',
-    # IDE配置（可选）
-    '.vscode', '.idea',
+    # 本地配置
+    '.claude', '.vscode', '.idea',
 }
 
 def is_excluded(path):

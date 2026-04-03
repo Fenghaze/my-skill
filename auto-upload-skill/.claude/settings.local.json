@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python \"C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\auto-upload-skill\\\\scripts\\\\sync.py\")",
-      "Bash(pip install:*)"
-    ]
-  }
-}
