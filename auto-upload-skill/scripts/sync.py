@@ -542,21 +542,36 @@ def generate_readme(skills, commands=None):
     if commands:
         commands_lines.append("## Commands")
         commands_lines.append("")
+        commands_lines.append("| 命令 | 功能 | 效果示例 |")
+        commands_lines.append("|------|------|---------|")
         for cmd in commands:
             name = cmd.get('name', '')
             desc = cmd.get('description', '')
-            usage = cmd.get('usage', '')
             preview = cmd.get('content_preview', '')
 
-            commands_lines.append(f"### `{name}`")
-            commands_lines.append(f"**描述：** {desc}")
-            if usage:
-                commands_lines.append(f"**用法：** {usage}")
-            commands_lines.append("")
-            commands_lines.append("```bash")
-            commands_lines.append(preview)
-            commands_lines.append("```")
-            commands_lines.append("")
+            # 从preview提取效果示例（取最后几行有意义的输出）
+            effect = ""
+            preview_lines = preview.split('\n')
+            for line in reversed(preview_lines):
+                stripped = line.strip()
+                # 找print语句或关键输出行
+                if 'print' in line and 'f\'' in line:
+                    # 提取print中的格式化部分
+                    start = line.find('f\'')
+                    if start == -1:
+                        start = line.find('f"')
+                    if start != -1:
+                        end = line.rfind('\'')
+                        if end > start:
+                            effect = line[start+2:end].replace('{', '').replace('}', '').replace('\\033[', '')
+                    break
+                elif '@username' in line or 'cwd_display' in line:
+                    # 取整行作为效果示例
+                    effect = stripped[:60]
+                    break
+
+            commands_lines.append(f"| `{name}` | {desc} | `{effect}` |")
+        commands_lines.append("")
 
     readme_content = f"""# My Skills
 
