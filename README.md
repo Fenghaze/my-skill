@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 16:44:42
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 16:52:34
 
 ## Skills
 
@@ -74,11 +74,11 @@ Use this skill when the user:
 - Mentions they wish they had help with a specific domain (design, testing, deployment, etc.)
 
 ### knowledge-review-skill
-**描述：** "当用户希望回顾刚实现的功能、总结学习要点、分析设计思路或代码实现时触发。适用于'/review'、'帮我总结这个功能'、'讲解一下这段代码'、'回顾一下'等请求。此技能会根据用户对相关知识点的掌握程度定制化总结内容。"
+**描述：** "当用户希望回顾刚实现的功能、总结学习要点、分析设计思路或代码实现时触发。适用于'/knowledge-review'、'帮我总结这个功能'、'讲解一下这段代码'、'回顾一下'等请求。此技能会根据用户对相关知识点的掌握程度定制化总结内容。"
 
 **使用方法：**
 当用户请求以下内容时触发：
-- `/review` - 触发知识回顾
+- `/knowledge-review` - 触发知识回顾
 - "帮我总结这个功能"
 - "讲解一下这段代码"
 - "回顾一下今天学的"
