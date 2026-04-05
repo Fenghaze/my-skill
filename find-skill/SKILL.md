@@ -1,6 +1,7 @@
 ---
+version: 1.0.0
 name: find-skills
-description: 帮助用户发现和安装AI Agent技能的工具。当用户询问"有没有能做X的技能"、"怎么实现X功能"或希望扩展Agent能力时自动触发。支持搜索skills.sh上的公开技能库。
+description: Help users discover and install AI Agent skills. Automatically triggers when users ask "is there a skill for X", "how to do X with a skill", or want to extend agent capabilities. Supports searching the public skills.sh registry.
 ---
 
 # Find Skills
