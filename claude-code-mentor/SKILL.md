@@ -1,5 +1,5 @@
 ---
-version: 2.2.1
+version: 2.3.1
 name: claude-code-mentor
 description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
 ---
@@ -94,18 +94,41 @@ Claude Code 支持多代理同时工作，大幅提升效率：
 | API 文档生成 | `api-docs-writer` | 自动生成完整文档 |
 | 并行功能开发 | 多个 `feature-dev` | 团队式开发 |
 
-### 代理创建命令
+### GitHub 热门开源项目参考
 
-```markdown
-/plugin-dev:create-plugin 我的数据分析插件
+当用户想要自定义子代理或参考优秀实践时，推荐以下热门项目：
+
+| 项目 | 用途 | GitHub |
+|-----|------|--------|
+| **Claude Code 官方示例** | 学习官方子代理模式 | anthropics/claude-code |
+| **Multi-Agent Orchestration** | 多代理协作模式参考 | |
+| **Agent Workflows** | AI Agent 工作流设计 | |
+
+**搜索技巧**：
+- GitHub 搜索 `claude-code-agent` / `multi-agent-ai` / `agent-workflow`
+- 按 star 排序，寻找活跃项目的 agent 实现
+- 查看项目的 `examples/` 目录获取灵感
+
+### 自定义子代理创建流程
+
+当用户想要创建专属子代理时：
+
+```
+"我来帮你创建一个自定义子代理！这需要一个清晰的设计..."
+（调用 skill-creator 引导创建）
 ```
 
-这会启动 8 阶段插件创建流程，自动生成：
-- 目录结构
-- 命令文件
-- 代理定义
-- 技能配置
-- README 文档
+**创建步骤**：
+1. **定义代理角色** - 这个代理负责什么？
+2. **设计工具权限** - 需要哪些工具访问权限？
+3. **编写提示词** - 如何让代理正确执行任务？
+4. **测试验证** - 运行测试用例确保有效
+5. **迭代优化** - 根据反馈调整行为
+
+**适用场景**：
+- 需要专业化代理处理特定领域任务
+- 想要复用复杂的工作流模式
+- 希望将团队经验沉淀为自动化流程
 
 ## 四、Hooks 自动化工作流（实战必备）
 
@@ -402,6 +425,7 @@ skill-creator 会引导用户：
 ---
 
 ## 更新日志
+- v2.3.0：新增 GitHub 热门开源项目参考列表，添加自定义子代理创建流程引导
 - v2.2.0：新增自定义 skill 创建流程，find-skill 无匹配时调用 skill-creator 引导用户创建专属 skill
 - v2.1.0：新增智能 Skill 推荐功能，集成 find-skill 查找相关 skills，自动推荐 pr-review-toolkit、enhance-chat-skill、models-dev 等
 - v2.0.0：新增 `/feature-dev`、`/plugin-dev` 命令，子代理并行处理，Hooks 自动化工作流，MCP 集成
