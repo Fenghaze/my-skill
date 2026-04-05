@@ -1,7 +1,7 @@
 ---
-version: 2.8.1
+version: 2.8.2
 name: claude-code-mentor
-description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。**注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。** 提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。
+description: "Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。"
 
 ## 触发指令（自动执行）
 
