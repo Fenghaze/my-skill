@@ -1,6 +1,6 @@
 ---
 name: auto-upload-skill
-description: 本地skill创建后自动上传到GitHub的自动化工具。使用"/push-skills"命令时触发。
+description: 本地skill创建后自动上传到GitHub的自动化工具。当用户说"上传skills"、"同步skills"、"push skills"、"/push-skills"或希望将本地skill推送到GitHub时触发。
 version: 1.3.0
 author: fenghaze
 ---
