@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 15:53:09
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 15:55:05
 
 ## Skills
 
@@ -48,7 +48,7 @@ python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py
 ```
 
 ### claude-code-mentor
-**描述：** Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
+**描述：** Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。**注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。** 提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。
 
 
 ### enhance-chat-skill

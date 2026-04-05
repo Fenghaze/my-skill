@@ -1,7 +1,7 @@
 ---
-version: 2.6.2
+version: 2.7.1
 name: claude-code-mentor
-description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
+description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。**注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。** 提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。
 ---
 
 # Claude Code AI Agent 实战指南
@@ -545,6 +545,7 @@ skill-creator 会引导用户：
 ---
 
 ## 更新日志
+- v2.7.0：明确与 enhance-chat-skill 的优先级关系，功能需求先规划再指导
 - v2.6.0：新增官方动态关注章节，提醒主动获取 Claude Code 最新特性，避免使用过时信息
 - v2.5.0：修正自定义创建流程，子代理→plugin-dev、Hooks→update-config、MCP→参考官方SDK
 - v2.4.0：新增 Hooks 和 MCP 的 GitHub 参考资源及自定义创建流程引导
