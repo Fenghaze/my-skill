@@ -1,6 +1,7 @@
 ---
+version: 1.0.0
 name: claude-code-mentor
-description: Claude Code 新手引导与使用技巧助手。当用户首次使用 Claude Code、询问使用技巧、进行项目开发、或希望了解最佳实践时自动触发。提供对话式引导、推荐合适的工作流、帮助快速上手 Claude Code 进行高效项目开发。
+description: Claude Code 使用技巧与 AI 应用助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，帮助用户高效使用 AI 进行项目开发。
 ---
 
 # Claude Code 使用指南
