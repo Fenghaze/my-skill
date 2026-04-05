@@ -542,32 +542,38 @@ def generate_readme(skills, commands=None):
     if commands:
         commands_lines.append("## Commands")
         commands_lines.append("")
-        commands_lines.append("| 命令 | 功能 | 效果示例 |")
-        commands_lines.append("|------|------|---------|")
         for cmd in commands:
             name = cmd.get('name', '')
             desc = cmd.get('description', '')
             preview = cmd.get('content_preview', '')
 
-            # 从preview提取效果示例
-            effect = ""
-            preview_lines = preview.split('\n')
-            for line in preview_lines:
+            # 提取shell代码部分（heredoc或关键代码）
+            shell_code = ""
+            in_heredoc = False
+            for line in preview.split('\n'):
                 stripped = line.strip()
-                # 找效果示例注释：# 效果示例: ... 或 # 效果: ...
-                if stripped.startswith('#') and ('效果示例' in stripped or (stripped.startswith('# 效果:') and len(stripped) > 5)):
-                    raw = stripped.lstrip('#').strip()
-                    if ':' in raw:
-                        parts = raw.split(':', 1)
-                        if len(parts) > 1 and parts[1].strip():
-                            effect = parts[1].strip()[:60]
-                            break
+                if '<<' in stripped and 'EOF' in stripped:
+                    in_heredoc = True
+                    shell_code += stripped + "\n"
+                elif in_heredoc:
+                    if stripped == 'EOF' or stripped.startswith('EOF'):
+                        in_heredoc = False
+                        break
+                    shell_code += stripped + "\n"
 
-            # 兜底：直接用描述
-            if not effect:
-                effect = desc.split('。')[0] if desc else ""
+            # 兜底：用print语句
+            if not shell_code:
+                for line in preview.split('\n'):
+                    if 'print' in line and '@username' in line:
+                        shell_code = line.strip()
+                        break
 
-            commands_lines.append(f"| `{name}` | {desc} | `{effect}` |")
+            commands_lines.append(f"- **{name}**：{desc}")
+            if shell_code:
+                commands_lines.append("  ```")
+                commands_lines.append(shell_code.strip())
+                commands_lines.append("  ```")
+            commands_lines.append("")
         commands_lines.append("")
 
     readme_content = f"""# My Skills
