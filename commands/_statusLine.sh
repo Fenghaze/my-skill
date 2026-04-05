@@ -40,8 +40,8 @@ try:
     tool_mode = data.get('permission_mode', 'default')
     mode_label = MODE_LABELS.get(tool_mode, tool_mode)
 
-    print(f'@{username} {cwd_display}:[{model_display}|{style_name}|{mode_label}]({context_info})')
+    print(f'\033[33m@{username}\033[0m \033[36m{cwd_display}\033[0m:[\033[33m{model_display}\033[0m|\033[35m{style_name}\033[0m|\033[32m{mode_label}\033[0m]\033[32m({context_info})\033[0m')
 
 except Exception:
-    print(f'@? ?:[?|default|?](100%)')
+    print(f'\033[33m@?\033[0m \033[36m?\033[0m:[\033[31mError\033[0m|\033[33mdefault\033[0m]\033[32m(100%)\033[0m')
 "
