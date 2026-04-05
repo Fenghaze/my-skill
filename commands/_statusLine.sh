@@ -1,7 +1,7 @@
 #!/bin/bash
 # Claude Code 状态栏插件
-# 功能: 显示用户、目录、模型、风格、权限模式和上下文使用率
-# 效果示例: @fenghaze /d/coding:[claude-sonnet-4-6|Explanatory|auto](83%)
+# 功能: 显示用户、目录、模型、风格、权限模式、已触发skills和上下文使用率
+# 效果示例: @fenghaze /d/coding:[claude-sonnet-4-6|Explanatory|auto|skill1|skill2](83%)
 
 /d/Miniconda/python.exe -c "
 import sys, json, subprocess
@@ -44,7 +44,14 @@ try:
     tool_mode = data.get('permission_mode', 'default')
     mode_label = MODE_LABELS.get(tool_mode, tool_mode)
 
-    print(f'\033[35m@{username}\033[0m \033[36m{cwd_display}\033[0m:[\033[34m{model_display}\033[0m|\033[33m{style_name}\033[0m|\033[32m{mode_label}\033[0m]\033[{ctx_color}m({context_info})\033[0m')
+    # 获取已触发的skills列表
+    active_skills = data.get('activeSkills', [])
+    if active_skills:
+        skills_display = '|' + '|'.join(active_skills)
+    else:
+        skills_display = ''
+
+    print(f'\033[35m@{username}\033[0m \033[36m{cwd_display}\033[0m:[\033[34m{model_display}\033[0m|\033[33m{style_name}\033[0m|\033[32m{mode_label}\033[0m{skills_display}\033[0m]\033[{ctx_color}m({context_info})\033[0m')
 
 except Exception:
     print(f'\033[31m@?\033[0m \033[36m?\033[0m:[\033[31mError\033[0m|\033[35m?\033[0m|\033[31m?\033[0m]\033[33m(100%)\033[0m')
