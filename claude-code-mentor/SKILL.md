@@ -1,5 +1,5 @@
 ---
-version: 2.3.1
+version: 2.4.1
 name: claude-code-mentor
 description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
 ---
@@ -203,6 +203,43 @@ Hooks 让你在特定时机自动执行操作，实现真正的自动化：
 }
 ```
 
+### GitHub 热门 Hooks 配置参考
+
+当用户想要自定义 Hooks 或参考优秀实践时，推荐以下资源：
+
+| 项目 | 用途 | 搜索关键词 |
+|-----|------|-----------|
+| **Claude Code 官方 Hooks** | 学习官方最佳实践 | `claude-code hooks examples` |
+| **Awesome Claude Code** | 社区精选配置 | `awesome-claude-code` |
+| **DevOps Hooks** | CI/CD 集成模式 | `github actions hook automation` |
+
+**搜索技巧**：
+- GitHub 搜索 `claude-code-settings.json` / `claude-hooks-config`
+- 查看 `.claude/settings.json` 目录获取灵感
+- 按 star 排序，寻找活跃项目的配置参考
+
+### 自定义 Hooks 创建流程
+
+当用户想要创建专属 Hooks 配置时：
+
+```
+"我来帮你设计一个自定义 Hook！这需要一个清晰的工作流..."
+（调用 skill-creator 引导创建）
+```
+
+**创建步骤**：
+1. **确定触发时机** - SessionStart / PreToolUse / PostToolUse / Stop / SubagentStop？
+2. **定义匹配规则** - 什么条件触发？（matcher 模式）
+3. **选择执行类型** - command / prompt / agent？
+4. **编写执行内容** - 具体要执行什么？
+5. **测试验证** - 运行测试确保有效
+
+**适用场景**：
+- 自动化代码检查/格式化
+- 提交前安全验证
+- 上下文自动加载
+- 任务完成后自动清理
+
 ## 五、MCP 服务器集成
 
 Claude Code 通过 Model Context Protocol 扩展能力：
@@ -218,6 +255,44 @@ Claude Code 通过 Model Context Protocol 扩展能力：
 | claude-vscode | 编辑器 | VS Code 操作 |
 
 连接外部工具：MCP 服务器可以连接 JIRA、Figma、PostgreSQL 等
+
+### GitHub 热门 MCP 服务器参考
+
+当用户想要自定义 MCP 或参考优秀实践时，推荐以下资源：
+
+| MCP 服务器 | 用途 | GitHub |
+|-----------|------|--------|
+| **官方 MCP Servers** | Anthropic 官方维护 | modelcontextprotocol/servers |
+| **GitHub MCP** | GitHub 操作自动化 | modelcontextprotocol/server-github |
+| **Slack MCP** | 团队协作集成 | modelcontextprotocol/server-slack |
+| **PostgreSQL MCP** | 数据库操作 | modelcontextprotocol/server-postgres |
+
+**搜索技巧**：
+- GitHub 搜索 `mcp-server` / `model-context-protocol`
+- 查看 `modelcontextprotocol/servers` 获取完整列表
+- 按 star 排序，寻找活跃项目
+
+### 自定义 MCP 创建流程
+
+当用户想要创建专属 MCP 服务器时：
+
+```
+"我来帮你创建一个自定义 MCP 服务器！这需要一个清晰的设计..."
+（调用 skill-creator 引导创建）
+```
+
+**创建步骤**：
+1. **定义功能范围** - 这个 MCP 提供什么能力？
+2. **设计工具接口** - 需要暴露哪些工具？（tools 列表）
+3. **编写服务端** - 使用 Node.js/Python 实现
+4. **配置连接** - 在 settings.json 中注册
+5. **测试验证** - 确保工具调用正常
+
+**适用场景**：
+- 连接私有 API 或内部系统
+- 封装特定的业务逻辑
+- 集成专有工具链
+- 自定义数据源连接
 ```
 
 ## 六、CLAUDE.md 高级用法
@@ -425,6 +500,7 @@ skill-creator 会引导用户：
 ---
 
 ## 更新日志
+- v2.4.0：新增 Hooks 和 MCP 的 GitHub 参考资源及自定义创建流程引导
 - v2.3.0：新增 GitHub 热门开源项目参考列表，添加自定义子代理创建流程引导
 - v2.2.0：新增自定义 skill 创建流程，find-skill 无匹配时调用 skill-creator 引导用户创建专属 skill
 - v2.1.0：新增智能 Skill 推荐功能，集成 find-skill 查找相关 skills，自动推荐 pr-review-toolkit、enhance-chat-skill、models-dev 等
