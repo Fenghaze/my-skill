@@ -1,7 +1,30 @@
 ---
-version: 2.7.1
+version: 2.8.1
 name: claude-code-mentor
 description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。**注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。** 提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。
+
+## 触发指令（自动执行）
+
+当 mentor-skill 被触发时，**立即使用 Agent 工具启动子代理处理**，不要在主会话中回答：
+
+```
+使用 Agent 工具，subagent_type="general-purpose"，prompt 包含：
+1. 用户的具体问题
+2. 完整的 SKILL.md 内容
+3. 要求子代理根据 SKILL.md 提供指导
+4. run_in_background: true
+```
+
+## 触发优先级（重要）
+
+当用户问题同时涉及多个领域时，按以下优先级处理：
+
+1. **mentor-skill（最高优先）** — Claude Code 使用技巧、上下文管理、会话优化、最佳实践类问题
+2. **enhance-chat-skill** — 功能需求规划、设计类问题
+3. **claude-code-guide（最低）** — 基础命令查询、help 类问题
+
+**处理方式**：mentor-skill 使用独立子代理处理，避免污染主会话上下文。
+
 ---
 
 # Claude Code AI Agent 实战指南
@@ -542,9 +565,36 @@ skill-creator 会引导用户：
 - **流程咨询** → 结构化的工作流说明
 - **实战问题** → 基于官方文档的最佳实践
 
+### 子代理处理机制（重要）
+
+**mentor-skill 使用独立子代理处理**，流程如下：
+
+```
+用户触发 mentor-skill
+    ↓
+启动 claude-code-mentor 子代理（后台运行）
+    ↓
+子代理读取 SKILL.md 内容
+    ↓
+子代理根据问题类型提供指导
+    ↓
+子代理返回结果给用户
+```
+
+**为什么这样做**：
+- 避免 mentor 相关的长对话污染主会话上下文
+- 主会话可以专注执行主要任务
+- mentor 的指导内容不会占用主会话的 token 配额
+
+**后台执行**：
+- mentor-skill 默认使用 `run_in_background: true`
+- 如果需要同步结果，使用 `run_in_background: false`
+- 用户会收到后台任务完成的通知
+
 ---
 
 ## 更新日志
+- v2.8.0：使用独立子代理处理 mentor 问题，避免污染主会话上下文；明确触发优先级：mentor-skill > claude-code-guide
 - v2.7.0：明确与 enhance-chat-skill 的优先级关系，功能需求先规划再指导
 - v2.6.0：新增官方动态关注章节，提醒主动获取 Claude Code 最新特性，避免使用过时信息
 - v2.5.0：修正自定义创建流程，子代理→plugin-dev、Hooks→update-config、MCP→参考官方SDK
