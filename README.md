@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 11:18:15
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 11:19:16
 
 ## Skills
 
@@ -131,6 +131,10 @@ models: "claude-opus-4,gpt-4o,gemini-2-pro"  # 用逗号分隔
 ```
 provider: "anthropic"  # 提供商名称
 ```
+
+### upload-skills
+**描述：** 一键同步本地 skills 到 GitHub 仓库。说"上传skills"、"同步skills"或"/upload"时触发。
+
 
 
 ---
