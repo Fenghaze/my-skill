@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 16:13:04
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 16:37:31
 
 ## Skills
 
@@ -101,6 +101,10 @@ models: "claude-opus-4,gpt-4o,gemini-2-pro"  # 用逗号分隔
 ```
 provider: "anthropic"  # 提供商名称
 ```
+
+### save-doc
+**描述：** 
+
 
 
 ## Commands
