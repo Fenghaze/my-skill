@@ -136,21 +136,43 @@ def get_all_commands():
             cmd_info = {
                 'name': cmd_path.name,
                 'path': str(cmd_path),
-                'description': ''
+                'description': '',
+                'usage': '',
+                'content_preview': ''
             }
-            # 尝试读取文件前几行作为描述
             try:
                 content = cmd_path.read_text(encoding='utf-8', errors='ignore')
                 lines = content.split('\n')
-                # 取第一行非空行作为描述
+
+                # 提取描述：跳过shebang，找第一个#开头的注释行
                 for line in lines:
                     stripped = line.strip()
-                    if stripped and not stripped.startswith('#'):
-                        cmd_info['description'] = stripped[:100]
-                        break
+                    if stripped.startswith('#!/'):
+                        continue  # 跳过shebang
                     elif stripped.startswith('#'):
-                        # 跳过注释行，继续找
-                        continue
+                        # 去掉#和空格，提取描述
+                        desc = stripped.lstrip('#').strip()
+                        if desc and not desc.startswith('-'):
+                            cmd_info['description'] = desc
+                            break
+                        elif desc.startswith('-'):
+                            cmd_info['usage'] = desc
+                    elif stripped:
+                        # 第一个非注释非空行作为描述兜底
+                        if not cmd_info['description']:
+                            cmd_info['description'] = stripped[:100]
+                        break
+
+                # 取前20行作为内容预览
+                preview_lines = []
+                for line in lines[:20]:
+                    # 跳过shebang行
+                    if line.strip().startswith('#!/'):
+                        preview_lines.append(f"# {line.strip()}")
+                    else:
+                        preview_lines.append(line)
+                cmd_info['content_preview'] = '\n'.join(preview_lines)
+
             except Exception as e:
                 logger.warning(f"Failed to read {cmd_path.name}: {e}")
             commands.append(cmd_info)
@@ -520,13 +542,21 @@ def generate_readme(skills, commands=None):
     if commands:
         commands_lines.append("## Commands")
         commands_lines.append("")
-        commands_lines.append("| 命令 | 描述 |")
-        commands_lines.append("|------|------|")
         for cmd in commands:
             name = cmd.get('name', '')
             desc = cmd.get('description', '')
-            commands_lines.append(f"| `{name}` | {desc} |")
-        commands_lines.append("")
+            usage = cmd.get('usage', '')
+            preview = cmd.get('content_preview', '')
+
+            commands_lines.append(f"### `{name}`")
+            commands_lines.append(f"**描述：** {desc}")
+            if usage:
+                commands_lines.append(f"**用法：** {usage}")
+            commands_lines.append("")
+            commands_lines.append("```bash")
+            commands_lines.append(preview)
+            commands_lines.append("```")
+            commands_lines.append("")
 
     readme_content = f"""# My Skills
 
