@@ -552,31 +552,29 @@ def generate_readme(skills, commands=None):
             # 从preview提取效果示例
             effect = ""
             preview_lines = preview.split('\n')
-            for line in preview_lines:
-                stripped = line.strip()
-                # 优先找格式注释：# 格式: ...
-                if stripped.startswith('#') and '格式' in stripped:
+            i = 0
+            while i < len(preview_lines):
+                stripped = preview_lines[i].strip()
+                # 优先找格式注释：# 格式: ... 或 # 效果: ...
+                if stripped.startswith('#') and ('格式' in stripped or stripped == '# 效果' or stripped == '#效果'):
                     effect = stripped.lstrip('#').strip()
+                    if effect == '效果' and i + 1 < len(preview_lines):
+                        # 下一行是Python print语句，提取之
+                        next_line = preview_lines[i + 1].strip()
+                        if 'print' in next_line and '@username' in next_line:
+                            raw = next_line[next_line.find('print'):]
+                            for quote in ["f'", 'f"']:
+                                qpos = raw.find(quote)
+                                if qpos != -1:
+                                    raw = raw[qpos+2:]
+                                    parts = raw.rsplit('\'', 1) if quote == "f'" else raw.rsplit('"', 1)
+                                    if len(parts) > 1:
+                                        raw = parts[0]
+                                    effect = raw.replace('\\033[', '').replace('033[', '').replace('m', '').replace('\\', '')
+                                    effect = effect.replace('{', '').replace('}', '')[:60]
+                                    break
                     break
-                # 其次找print语句
-                if 'print' in stripped and '@username' in stripped:
-                    # 提取f-string内容（处理转义引号）
-                    raw = stripped[stripped.find('print'):]
-                    # 找到f'或f"之后的内容
-                    for quote in ["f'", 'f"']:
-                        qpos = raw.find(quote)
-                        if qpos != -1:
-                            raw = raw[qpos+2:]  # 跳过f和第一个引号
-                            # 找配对的结束引号
-                            parts = raw.rsplit('\'', 1) if quote == "f'" else raw.rsplit('"', 1)
-                            if len(parts) > 1:
-                                raw = parts[0]
-                            # 清理转义序列
-                            effect = raw.replace('\\033[', '').replace('033[', '').replace('m', '').replace('\\', '')
-                            effect = effect.replace('{', '').replace('}', '')[:60]
-                            break
-                if effect:
-                    break
+                i += 1
 
             # 兜底：直接用描述
             if not effect:
