@@ -1,11 +1,12 @@
 ---
-version: 2.8.2
+version: 2.8.3
 name: claude-code-mentor
 description: "Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。"
+---
 
 ## 触发指令（自动执行）
 
-当 mentor-skill 被触发时，**立即使用 Agent 工具启动子代理处理**，不要在主会话中回答：
+当 mentor-skill 被触发时，立即使用 Agent 工具启动子代理处理，不要在主会话中回答：
 
 ```
 使用 Agent 工具，subagent_type="general-purpose"，prompt 包含：
@@ -19,11 +20,11 @@ description: "Claude Code 使用技巧与 AI Agent 实战助手。当用户询�
 
 当用户问题同时涉及多个领域时，按以下优先级处理：
 
-1. **mentor-skill（最高优先）** — Claude Code 使用技巧、上下文管理、会话优化、最佳实践类问题
-2. **enhance-chat-skill** — 功能需求规划、设计类问题
-3. **claude-code-guide（最低）** — 基础命令查询、help 类问题
+1. mentor-skill（最高优先）- Claude Code 使用技巧、上下文管理、会话优化、最佳实践类问题
+2. enhance-chat-skill - 功能需求规划、设计类问题
+3. claude-code-guide（最低）- 基础命令查询、help 类问题
 
-**处理方式**：mentor-skill 使用独立子代理处理，避免污染主会话上下文。
+处理方式：mentor-skill 使用独立子代理处理，避免污染主会话上下文。
 
 ---
 
