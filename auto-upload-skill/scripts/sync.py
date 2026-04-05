@@ -547,11 +547,15 @@ def generate_readme(skills, commands=None):
             desc = cmd.get('description', '')
             preview = cmd.get('content_preview', '')
 
-            # 提取shell代码部分
+            # 提取shell代码示例：直接用注释中的格式示例
             shell_code = ""
             for line in preview.split('\n'):
-                if 'print' in line and '@username' in line:
-                    shell_code = line.strip()
+                stripped = line.strip()
+                if stripped.startswith('#') and '效果示例' in stripped:
+                    # 提取 "效果示例: ..." 中的示例
+                    idx = stripped.find('效果示例:')
+                    if idx != -1:
+                        shell_code = stripped[idx + 5:].strip()
                     break
 
             commands_lines.append(f"- **{name}**：{desc}")

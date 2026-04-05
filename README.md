@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 15:17:21
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 15:20:10
 
 ## Skills
 
@@ -140,6 +140,9 @@ provider: "anthropic"  # 提供商名称
 ## Commands
 
 - **_statusLine.sh**：Claude Code 状态栏插件
+  ```
+@fenghaze /d/coding:[claude-sonnet-4-6|Explanatory|auto](83%)
+  ```
 
 
 ---
