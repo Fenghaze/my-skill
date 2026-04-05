@@ -1,11 +1,11 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 11:20:29
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 11:21:06
 
 ## Skills
 
 ### auto-upload-skill
-**描述：** 本地skill创建后自动上传到GitHub的自动化工具。说"上传skills"、"同步skills"、"push skills"、"上传skill"或"/upload"时触发。
+**描述：** 本地skill创建后自动上传到GitHub的自动化工具。使用"/push-skills"命令时触发。
 
 **使用方法：**
 **Python 版本（推荐）**
