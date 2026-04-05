@@ -33,13 +33,8 @@ try:
     context_pct = remaining if remaining is not None else 100
     context_info = f'{context_pct:.0f}%'
 
-    # 根据剩余上下文选择颜色
-    if context_pct > 50:
-        ctx_color = '32'   # 绿色 - 充裕
-    elif context_pct > 20:
-        ctx_color = '33'   # 黄色 - 警告
-    else:
-        ctx_color = '31'   # 红色 - 紧张
+    # 根据剩余上下文选择颜色 (>20%: 白色正常, <=20%: 红色警告)
+    ctx_color = '37' if context_pct > 20 else '31'
 
     output_style = data.get('output_style', {})
     style_name = output_style.get('name') if isinstance(output_style, dict) else None
