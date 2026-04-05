@@ -549,26 +549,29 @@ def generate_readme(skills, commands=None):
             desc = cmd.get('description', '')
             preview = cmd.get('content_preview', '')
 
-            # 从preview提取效果示例（取最后几行有意义的输出）
+            # 从preview提取效果示例
             effect = ""
             preview_lines = preview.split('\n')
             for line in reversed(preview_lines):
                 stripped = line.strip()
-                # 找print语句或关键输出行
-                if 'print' in line and 'f\'' in line:
-                    # 提取print中的格式化部分
-                    start = line.find('f\'')
-                    if start == -1:
-                        start = line.find('f"')
-                    if start != -1:
-                        end = line.rfind('\'')
-                        if end > start:
-                            effect = line[start+2:end].replace('{', '').replace('}', '').replace('\\033[', '')
+                # 找包含@username或cwd_display的关键输出行
+                if '@username' in stripped or 'cwd_display' in stripped:
+                    # 提取print语句内容
+                    if 'print' in stripped:
+                        # 去掉print( 和结尾的 )
+                        start = stripped.find('print(') + 6
+                        end = stripped.rfind(')')
+                        if start > 5 and end > start:
+                            raw = stripped[start:end].strip('\'\"')
+                            # 清理转义序列和变量
+                            effect = raw.replace(f'\\033[{', '').replace('}]', '').replace('}', '').replace('{', '')
+                    else:
+                        effect = stripped[:60]
                     break
-                elif '@username' in line or 'cwd_display' in line:
-                    # 取整行作为效果示例
-                    effect = stripped[:60]
-                    break
+
+            # 兜底：直接用描述
+            if not effect:
+                effect = desc.split('。')[0] if desc else ""
 
             commands_lines.append(f"| `{name}` | {desc} | `{effect}` |")
         commands_lines.append("")
