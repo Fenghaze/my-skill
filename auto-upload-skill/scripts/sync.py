@@ -547,26 +547,12 @@ def generate_readme(skills, commands=None):
             desc = cmd.get('description', '')
             preview = cmd.get('content_preview', '')
 
-            # 提取shell代码部分（heredoc或关键代码）
+            # 提取shell代码部分
             shell_code = ""
-            in_heredoc = False
             for line in preview.split('\n'):
-                stripped = line.strip()
-                if '<<' in stripped and 'EOF' in stripped:
-                    in_heredoc = True
-                    shell_code += stripped + "\n"
-                elif in_heredoc:
-                    if stripped == 'EOF' or stripped.startswith('EOF'):
-                        in_heredoc = False
-                        break
-                    shell_code += stripped + "\n"
-
-            # 兜底：用print语句
-            if not shell_code:
-                for line in preview.split('\n'):
-                    if 'print' in line and '@username' in line:
-                        shell_code = line.strip()
-                        break
+                if 'print' in line and '@username' in line:
+                    shell_code = line.strip()
+                    break
 
             commands_lines.append(f"- **{name}**：{desc}")
             if shell_code:
