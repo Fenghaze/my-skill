@@ -1,7 +1,7 @@
 ---
-version: 2.1.1
+version: 2.2.1
 name: claude-code-mentor
-description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
+description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
 ---
 
 # Claude Code AI Agent 实战指南
@@ -361,7 +361,27 @@ fi
 
 1. **直接匹配** → 找到明确对应的 skill，立即推荐
 2. **模糊匹配** → 找到相关 skill，说明可能有用
-3. **无匹配** → 告知用户当前无可用 skill，建议其他方式
+3. **无匹配** → 调用 **skill-creator** 帮用户创建自定义 skill
+
+#### 自定义 Skill 创建流程
+
+当 find-skill 找不到合适的 skill 时：
+
+```
+"没找到完全匹配的 skill，但我可以帮你创建一个！"
+（调用 skill-creator）
+```
+
+skill-creator 会引导用户：
+1. 定义 skill 的用途和触发场景
+2. 编写 skill 指令
+3. 测试验证效果
+4. 保存并立即可用
+
+**适用场景**：
+- 用户有重复性任务需要自动化
+- 用户的工作流有特殊需求
+- 用户想把自己的经验沉淀为可复用工具
 
 ## 十一、输出选项
 
@@ -382,6 +402,7 @@ fi
 ---
 
 ## 更新日志
+- v2.2.0：新增自定义 skill 创建流程，find-skill 无匹配时调用 skill-creator 引导用户创建专属 skill
 - v2.1.0：新增智能 Skill 推荐功能，集成 find-skill 查找相关 skills，自动推荐 pr-review-toolkit、enhance-chat-skill、models-dev 等
 - v2.0.0：新增 `/feature-dev`、`/plugin-dev` 命令，子代理并行处理，Hooks 自动化工作流，MCP 集成
 - v1.0.0：初始版本
