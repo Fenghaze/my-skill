@@ -195,8 +195,47 @@ def is_excluded(path):
     return False
 
 
+def increment_version(content):
+    """递增版本号，返回新内容和是否更新"""
+    lines = content.split('\n')
+    new_lines = []
+    version_found = False
+    updated = False
+
+    for line in lines:
+        if line.strip().startswith('version:'):
+            version_found = True
+            # 解析版本号
+            parts = line.split(':', 1)
+            if len(parts) == 2:
+                old_version = parts[1].strip().strip('"').strip("'")
+                try:
+                    # 尝试解析 x.x.x 格式
+                    ver_parts = old_version.split('.')
+                    if len(ver_parts) == 3:
+                        # 递增 patch 版本
+                        patch = int(ver_parts[2]) + 1
+                        new_version = f"{ver_parts[0]}.{ver_parts[1]}.{patch}"
+                        new_line = line.replace(old_version, new_version)
+                        new_lines.append(new_line)
+                        logger.info(f"Version updated: {old_version} -> {new_version}")
+                        updated = True
+                        continue
+                except (ValueError, IndexError):
+                    pass
+        new_lines.append(line)
+
+    if not version_found:
+        # 如果没有版本号，在frontmatter开头添加
+        new_lines.insert(1, "version: 1.0.0")
+        updated = True
+        logger.info("Added version: 1.0.0")
+
+    return '\n'.join(new_lines), updated
+
+
 def copy_skill_to_repo(skill_name):
-    """复制skill到git仓库"""
+    """复制skill到git仓库，如有变化则更新版本号"""
     skills_dir = Path(CONFIG["skillsDir"])
     repo_dir = Path(CONFIG["repoDir"])
 
@@ -206,6 +245,22 @@ def copy_skill_to_repo(skill_name):
     if not src.exists():
         logger.warning(f"Skill {skill_name} not found in {skills_dir}")
         return False
+
+    # 检查 SKILL.md 是否有变化（对比源和目标）
+    src_skill_md = src / "SKILL.md"
+    dst_skill_md = dst / "SKILL.md" if dst.exists() else None
+
+    version_updated = False
+    if src_skill_md.exists():
+        src_content = src_skill_md.read_text(encoding='utf-8')
+        if dst_skill_md and dst_skill_md.exists():
+            dst_content = dst_skill_md.read_text(encoding='utf-8')
+            if src_content != dst_content:
+                # 有变化，递增版本号
+                new_content, version_updated = increment_version(src_content)
+                if version_updated:
+                    src_skill_md.write_text(new_content, encoding='utf-8')
+                    logger.info(f"Auto-incremented version for '{skill_name}'")
 
     # 删除旧版本
     if dst.exists():
