@@ -1,5 +1,5 @@
 ---
-version: 2.5.1
+version: 2.6.1
 name: claude-code-mentor
 description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
 ---
@@ -377,7 +377,49 @@ fi
   └── 批准/请求修改
 ```
 
-## 九、上下文优化技巧
+## 九、官方动态关注（新特性推荐）
+
+`★ Insight ─────────────────────────────────────`
+Claude Code 更新频繁，新特性可能与旧文档描述不同。**主动向用户推荐最新特性**，避免使用已过时或已改进的旧方案。
+`─────────────────────────────────────────────────`
+
+### 必关注的官方资源
+
+| 资源 | 链接 | 更新频率 |
+|-----|------|---------|
+| **GitHub Releases** | [anthropics/claude-code/releases](https://github.com/anthropics/claude-code/releases) | 每个版本 |
+| **官方文档** | [docs.anthropic.com/claude-code](https://docs.anthropic.com/claude-code) | 持续更新 |
+| **Changelog** | [github.com/anthropics/claude-code/blob/main/CHANGELOG.md](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) | 每个版本 |
+
+### 推荐时机
+
+**场景 1：用户询问某功能时**
+```
+用户："如何实现自动提交？"
+→ 先查最新文档/changelog，确认当前推荐方式
+→ 如有新 API 或更好方案，主动告知："新版 Claude Code 已支持 XXX，建议使用新方式"
+```
+
+**场景 2：用户询问新特性时**
+```
+用户："Claude Code 有哪些新功能？"
+→ 主动获取最新 releases 信息
+→ 介绍最新版本的关键新特性
+```
+
+**场景 3：检测到用户使用旧方式时**
+```
+用户提到旧版 API 或已废弃用法
+→ 主动提醒："这个用法在新版已改变，建议改用..."
+```
+
+### 获取最新信息的优先级
+
+1. **首选**：使用 `WebSearch` 搜索 "Claude Code changelog [年份]"
+2. **次选**：使用 `mcp__context7__query-docs` 查询官方文档
+3. **参考**：GitHub releases 查看版本发布说明
+
+## 十一、上下文优化技巧
 
 `★ Insight ─────────────────────────────────────`
 上下文窗口是共享资源——你放越多历史记录，能用的空间就越少。主动管理上下文 = 更高的 AI 响应质量。
@@ -389,7 +431,7 @@ fi
 4. **新会话接手**：话题转换时开启新会话
 5. **CLAUDE.md 沉淀**：项目级上下文持久化
 
-## 十、最佳实践
+## 十二、最佳实践
 
 ### 做
 - 为每个项目创建 CLAUDE.md
@@ -405,7 +447,7 @@ fi
 - 不要跳过权限确认除非完全信任
 - 不要忽略 Hooks 的自动化潜力
 
-## 十二、智能 Skill 推荐
+## 十三、智能 Skill 推荐
 
 当用户提问涉及以下场景时，主动调用 **find-skill** 查找并推荐相关 skills：
 
@@ -484,7 +526,7 @@ skill-creator 会引导用户：
 - 用户的工作流有特殊需求
 - 用户想把自己的经验沉淀为可复用工具
 
-## 十一、输出选项
+## 十四、输出选项
 
 用户可以要求：
 - **对话指导**：直接回答问题（默认）
@@ -503,6 +545,7 @@ skill-creator 会引导用户：
 ---
 
 ## 更新日志
+- v2.6.0：新增官方动态关注章节，提醒主动获取 Claude Code 最新特性，避免使用过时信息
 - v2.5.0：修正自定义创建流程，子代理→plugin-dev、Hooks→update-config、MCP→参考官方SDK
 - v2.4.0：新增 Hooks 和 MCP 的 GitHub 参考资源及自定义创建流程引导
 - v2.3.0：新增 GitHub 热门开源项目参考列表，添加自定义子代理创建流程引导
