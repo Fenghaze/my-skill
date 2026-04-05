@@ -1,7 +1,9 @@
 ---
 name: save-doc
-version: 1.0.1
-description: 当 Claude 输出了长文档（指南、教程、方案、总结等）时，自动保存到文件。用户要求保存文档内容、Claude 输出了超500字符的指南/教程、用户说"保存"/"save"/"导出文档"时使用。
+version: 1.0.2
+description: |
+  当 Claude 输出了长文档（指南、教程、方案、总结等）时，自动保存到文件。
+  触发场景：用户要求保存文档内容、Claude 输出了超500字符的指南/教程、用户说"保存"/"save"/"导出文档"时使用。
 ---
 
 # Save-Doc Skill

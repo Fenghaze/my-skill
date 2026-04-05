@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 16:41:18
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 16:42:52
 
 ## Skills
 
@@ -48,7 +48,7 @@ python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py
 ```
 
 ### claude-code-mentor
-**描述：** Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。
+**描述：** "Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。"
 
 
 ### enhance-chat-skill
@@ -74,7 +74,7 @@ Use this skill when the user:
 - Mentions they wish they had help with a specific domain (design, testing, deployment, etc.)
 
 ### knowledge-review-skill
-**描述：** 当用户希望回顾刚实现的功能、总结学习要点、分析设计思路或代码实现时触发。适用于'/review'、'帮我总结这个功能'、'讲解一下这段代码'、'回顾一下'等请求。此技能会根据用户对相关知识点的掌握程度定制化总结内容。
+**描述：** "当用户希望回顾刚实现的功能、总结学习要点、分析设计思路或代码实现时触发。适用于'/review'、'帮我总结这个功能'、'讲解一下这段代码'、'回顾一下'等请求。此技能会根据用户对相关知识点的掌握程度定制化总结内容。"
 
 **使用方法：**
 当用户请求以下内容时触发：
@@ -103,7 +103,7 @@ provider: "anthropic"  # 提供商名称
 ```
 
 ### save-doc
-**描述：** 当 Claude 输出了长文档（指南、教程、方案、总结等）时，自动保存到文件。用户要求保存文档内容、Claude 输出了超500字符的指南/教程、用户说"保存"/"save"/"导出文档"时使用。
+**描述：** | 当 Claude 输出了长文档（指南、教程、方案、总结等）时，自动保存到文件。 触发场景：用户要求保存文档内容、Claude 输出了超500字符的指南/教程、用户说"保存"/"save"/"导出文档"时使用。
 
 
 

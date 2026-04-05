@@ -191,27 +191,42 @@ def parse_skill_md(content):
 
     lines = content.split('\n')
     in_frontmatter = False
-    frontmatter_lines = []
+    current_key = None
+    current_value_lines = []
 
     for line in lines:
         if line.strip() == '---':
             if in_frontmatter:
-                # End of frontmatter
+                # End of frontmatter - save last key
+                if current_key and current_value_lines and current_key in info:
+                    info[current_key] = ' '.join(current_value_lines).strip()
                 break
             in_frontmatter = True
             continue
 
         if in_frontmatter:
-            frontmatter_lines.append(line)
+            # Check for line fold (|) - multi-line value
+            if line.startswith(' ') or line.startswith('\t'):
+                # Continuation line
+                current_value_lines.append(line.strip())
+            elif ':' in line:
+                # Save previous key if exists
+                if current_key and current_value_lines and current_key in info:
+                    info[current_key] = ' '.join(current_value_lines).strip()
 
-    # 解析frontmatter
-    for line in frontmatter_lines:
-        if ':' in line:
-            key, value = line.split(':', 1)
-            key = key.strip()
-            value = value.strip().strip('"').strip("'")
-            if key in info:
-                info[key] = value
+                # Parse new key
+                key, value = line.split(':', 1)
+                current_key = key.strip()
+                current_value_lines = [value.strip()] if value.strip() else []
+
+                # Handle empty value (no space after :)
+                if not value.strip():
+                    current_value_lines = []
+                # Handle quoted strings
+                elif (value.strip().startswith('"') and not value.strip().endswith('"')) or \
+                     (value.strip().startswith("'") and not value.strip().endswith("'")):
+                    # Multiline quoted string - accumulate
+                    current_value_lines = [value.strip()]
 
     return info
 
