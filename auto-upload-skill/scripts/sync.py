@@ -163,9 +163,9 @@ def get_all_commands():
                             cmd_info['description'] = stripped[:100]
                         break
 
-                # 取前30行作为内容预览
+                # 取所有行作为内容预览
                 preview_lines = []
-                for line in lines[:30]:
+                for line in lines:
                     # 跳过shebang行
                     if line.strip().startswith('#!/'):
                         preview_lines.append(f"# {line.strip()}")
@@ -554,7 +554,11 @@ def generate_readme(skills, commands=None):
             preview_lines = preview.split('\n')
             for line in preview_lines:
                 stripped = line.strip()
-                # 找print语句
+                # 优先找格式注释：# 格式: ...
+                if stripped.startswith('#') and '格式' in stripped:
+                    effect = stripped.lstrip('#').strip()
+                    break
+                # 其次找print语句
                 if 'print' in stripped and '@username' in stripped:
                     # 提取f-string内容（处理转义引号）
                     raw = stripped[stripped.find('print'):]
