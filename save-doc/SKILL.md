@@ -1,75 +1,84 @@
+---
+version: 1.0.0
+name: save-doc
+description: |
+  当 Claude 输出了长文档（指南、教程、方案、总结等）时，自动保存到文件。
+  **必须使用此 skill 的场景**：
+  - 用户要求保存 Claude 输出的文档内容
+  - Claude 输出了超过 500 字符且包含 # 标题的指南/教程/方案
+  - 用户说"保存"、"save"、"导出文档"
+  - 用户需要将 Claude 的输出保存为本地文件
+
+  **为什么需要此 skill**：避免用户手动复制粘贴，自动化文档保存流程，提升效率。
+---
+
 # Save-Doc Skill
 
 将 Claude 返回的长文档内容保存到文件中。
 
-## 触发场景
+## 触发条件
 
-- 用户需要保存 Claude 输出的指南、教程、方案、总结等文档
-- 用户不想手动复制粘贴，想要快速保存
+当满足以下条件时，Claude 会自动询问用户是否保存：
 
-## 工作流程
-
-### 阶段1：文档检测
-
-Claude 通过 `SessionStop` Hook 自动检测符合条件的输出：
-
-**检测条件（满足任一）：**
+**必须同时满足：**
 - 输出超过 500 字符
-- 输出包含文档类标记：`# ` (一级标题)、`##` (二级标题)
-- 输出包含文档类型关键词：`指南`、`教程`、`方案`、`总结`、`文档`
+- 包含 `# ` 标题（Markdown 一级标题）
 
-**检测到后，发送 prompt 询问：**
+**或满足其一：**
+- 包含关键词：`指南`、`教程`、`方案`、`总结`、`文档`
+
+## 保存选项
+
+用户选择保存方式：
+
 ```
 📄 检测到文档输出，是否保存？
-  1. 保存到 .claude/docs/ (自动生成文件名)
-  2. 保存到项目根目录 (自动生成文件名)
-  3. 指定保存路径
-  4. 不保存
+1. 保存到 .claude/docs/ (自动生成文件名) ← 默认
+2. 保存到项目根目录 (自动生成文件名)
+3. 指定保存路径
+4. 不保存
 ```
 
-### 阶段2：文件名生成
+## 文件名生成规则
 
-- 提取文档的第一个 `# ` 标题作为文件名
-- 过滤非法字符（`/\:*?"<>|`）
-- 空格替换为 `-`
-- 保留 `.md` 扩展名
-- 超长截断至 100 字符
+1. 提取文档的第一个 `# ` 标题作为文件名
+2. 过滤非法字符：`/\:*?"<>|` → 替换为 `-`
+3. 空格替换为 `-`
+4. 保留 `.md` 扩展名
+5. 超长截断至 100 字符
 
 **示例：**
-- 输入：`# Claude Code 高效上手新项目指南`
-- 输出：`Claude-Code-高效上手新项目指南.md`
+| 输入标题 | 生成文件名 |
+|----------|-----------|
+| `# Claude Code 高效上手新项目指南` | `Claude-Code-高效上手新项目指南.md` |
+| `# React 组件设计模式` | `React-组件设计模式.md` |
+| 无标题或标题非法 | `未命名文档-2024-01-15.md` |
 
-### 阶段3：保存执行
+## 保存路径
 
-**路径选项：**
-- 选项1：`.claude/docs/` (默认)
-- 选项2：当前项目根目录
-- 选项3：用户指定路径
+| 选项 | 路径 | 说明 |
+|------|------|------|
+| 1 | `~/.claude/docs/` | 默认，集中在同一目录 |
+| 2 | 项目根目录 | 随项目提交 |
+| 3 | 用户指定 | 绝对路径或相对路径 |
 
-**写入流程：**
-1. 如果文件已存在 → 追加 `-1`, `-2` 后缀
-2. 如果目录不存在 → 自动创建
-3. 写入文件
-4. 返回保存成功消息（含文件路径）
+## 写入流程
 
-### 阶段4：失败处理
+1. **检测选项**：用户选择 1/2/3
+2. **生成文件名**：按规则生成 `xxx.md`
+3. **检查冲突**：如果文件存在，追加 `-1`, `-2` 后缀
+4. **创建目录**：如果目录不存在，自动创建
+5. **写入文件**：使用 Write 工具保存
+6. **返回确认**：告诉用户完整保存路径
 
-| 失败场景 | 处理方式 |
-|---------|---------|
-| 目录无写权限 | 降级到当前项目根目录 |
+## 失败处理
+
+| 场景 | 处理方式 |
+|------|----------|
+| 目录无写权限 | 降级到项目根目录 |
 | 路径无效 | 提示用户输入有效路径 |
 | 磁盘空间不足 | 提示用户检查磁盘空间 |
-| Hook 执行失败 | 静默失败，不影响主流程 |
-
-## 目录结构
-
-```
-.claude/
-├── docs/                    # 默认保存目录
-│   └── [自动生成的文件].md
-└── memory/
-    └── MEMORY.md
-```
+| 用户选择4 | 静默取消，不显示任何内容 |
 
 ## 交互示例
 
@@ -78,31 +87,22 @@ Claude 通过 `SessionStop` Hook 自动检测符合条件的输出：
 ```
 用户：入职新公司，如何用 Claude Code 高效上手一个陌生的前端项目
 
-Claude：<输出长文档指南>
+Claude：<输出长文档指南，包含 # Claude Code 高效上手新项目指南 标题>
 
-[SessionStop Hook 触发]
 Claude：📄 检测到文档输出，是否保存？
-  1. 保存到 .claude/docs/ (自动生成文件名)
-  2. 保存到项目根目录
-  3. 指定保存路径
-  4. 不保存
+1. 保存到 .claude/docs/ (自动生成文件名)
+2. 保存到项目根目录
+3. 指定保存路径
+4. 不保存
 
 用户：1
 
-Claude：✅ 已保存到 C:/Users/Administrator/.claude/docs/Claude-Code-高效上手新项目指南.md
+Claude：✅ 已保存到 ~/.claude/docs/Claude-Code-高效上手新项目指南.md
 ```
 
-### 示例2：指定路径
+### 示例2：指定自定义路径
 
 ```
-用户：1
-
-Claude：📄 检测到文档输出，是否保存？
-  1. 保存到 .claude/docs/ (自动生成文件名)
-  2. 保存到项目根目录
-  3. 指定保存路径
-  4. 不保存
-
 用户：3
 
 Claude：请输入保存路径（绝对路径或相对于当前项目的路径）：
@@ -112,52 +112,68 @@ Claude：请输入保存路径（绝对路径或相对于当前项目的路径�
 Claude：✅ 已保存到 D:/my-docs/前端开发指南.md
 ```
 
+### 示例3：文件冲突处理
+
+```
+用户：1
+
+Claude：文件已存在，自动添加序号...
+
+Claude：✅ 已保存到 ~/.claude/docs/Claude-Code-高效上手新项目指南-1.md
+```
+
 ## 技术实现
 
-### Hook 配置
-
-在 `settings.json` 中配置 `SessionStop` Hook：
+### Hook 配置（settings.json）
 
 ```json
 {
   "hooks": {
-    "SessionStop": [{
+    "UserPromptSubmit": [{
       "matcher": "*",
       "hooks": [{
         "type": "prompt",
-        "prompt": "检测 Claude 的最后一条输出是否为文档（超过500字符或包含 # 标题）。如果是，询问用户是否保存。"
+        "prompt": "检测 Claude 的最后一条输出是否为文档（超过500字符且包含 # 标题，或包含 指南|教程|方案|总结|文档 关键词）。如果是，回复：📄 检测到文档输出，是否保存？\n1. 保存到 .claude/docs/ (自动生成文件名)\n2. 保存到项目根目录\n3. 指定保存路径\n4. 不保存",
+        "timeout": 30
       }]
     }]
   }
 }
 ```
 
-### 文档识别算法
+### 文档识别伪代码
 
-```typescript
-function isDocument(output: string): boolean {
-  const hasLength = output.length > 500;
-  const hasHeading = /^#+ /.test(output);
-  const hasKeywords = /指南|教程|方案|总结|文档/.test(output);
-  return hasLength && (hasHeading || hasKeywords);
-}
+```
+function isDocument(output):
+    if length(output) > 500:
+        if hasMarkdownHeading(output) OR hasKeyword(output):
+            return true
+    return false
 
-function extractTitle(output: string): string {
-  const match = output.match(/^#\s+(.+)$/m);
-  return match ? match[1] : '未命名文档';
-}
+function hasMarkdownHeading(output):
+    return /^#\s+.+$/m.test(output)
 
-function sanitizeFilename(title: string): string {
-  return title
-    .replace(/[/\:*?"<>|]/g, '-')
-    .replace(/\s+/g, '-')
-    .slice(0, 100) + '.md';
-}
+function hasKeyword(output):
+    return /指南|教程|方案|总结|文档/.test(output)
+```
+
+## 目录结构
+
+```
+~/.claude/
+├── docs/                    # 默认保存目录
+│   ├── Claude-Code-高效上手新项目指南.md
+│   └── 前端工具链搭建指南.md
+├── memory/
+│   └── MEMORY.md
+└── skills/
+    └── save-doc/
+        └── SKILL.md
 ```
 
 ## 注意事项
 
-- Hook 只在检测到文档输出时才触发 prompt，不会每次都询问
-- 默认保存目录 `.claude/docs/` 需要预先创建
-- 文件名冲突时会自动添加序号后缀
-- Hook 执行失败时静默降级，不影响正常对话流程
+- Hook 只在检测到文档输出时才触发，不会每次都询问
+- 文档识别基于启发式规则，可能有误判
+- 文件名自动生成，确保跨平台兼容性
+- 保存成功后，返回的路径包含完整绝对路径
