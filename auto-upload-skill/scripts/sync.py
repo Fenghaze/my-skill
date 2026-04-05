@@ -205,10 +205,16 @@ def parse_skill_md(content):
             continue
 
         if in_frontmatter:
-            # Check for line fold (|) - multi-line value
+            # Check for continuation line (indented)
             if line.startswith(' ') or line.startswith('\t'):
-                # Continuation line
-                current_value_lines.append(line.strip())
+                # Continuation line - strip leading whitespace, filter out leading |
+                stripped = line.strip()
+                if stripped.startswith('|'):
+                    stripped = stripped[1:].strip()
+                elif stripped.startswith('>'):
+                    stripped = stripped[1:].strip()
+                if current_key:
+                    current_value_lines.append(stripped)
             elif ':' in line:
                 # Save previous key if exists
                 if current_key and current_value_lines and current_key in info:
@@ -217,16 +223,18 @@ def parse_skill_md(content):
                 # Parse new key
                 key, value = line.split(':', 1)
                 current_key = key.strip()
-                current_value_lines = [value.strip()] if value.strip() else []
+                val_stripped = value.strip()
 
-                # Handle empty value (no space after :)
-                if not value.strip():
+                # Handle YAML multi-line indicators | and >
+                if val_stripped in ('|', '>'):
                     current_value_lines = []
-                # Handle quoted strings
-                elif (value.strip().startswith('"') and not value.strip().endswith('"')) or \
-                     (value.strip().startswith("'") and not value.strip().endswith("'")):
-                    # Multiline quoted string - accumulate
-                    current_value_lines = [value.strip()]
+                elif val_stripped.startswith('|') or val_stripped.startswith('>'):
+                    # Strip the indicator
+                    current_value_lines = [val_stripped[1:].strip()]
+                elif val_stripped:
+                    current_value_lines = [val_stripped]
+                else:
+                    current_value_lines = []
 
     return info
 
