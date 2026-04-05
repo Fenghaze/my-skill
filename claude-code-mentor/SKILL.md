@@ -1,7 +1,7 @@
 ---
-version: 2.0.1
+version: 2.1.1
 name: claude-code-mentor
-description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
+description: Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、AI 工作流、最佳实践等问题时自动触发。提供会话分割策略、上下文复用技巧、项目进度维护等指导，并智能推荐相关 skills 帮助用户高效使用 AI 进行项目开发。特别适合想要快速掌握 AI Agent 实战的开发者。
 ---
 
 # Claude Code AI Agent 实战指南
@@ -296,12 +296,72 @@ fi
 - 提交前用 /review 审查
 - Hooks 自动化重复工作
 - 并行处理独立任务
+- **主动推荐相关 skills**（见下方说明）
 
 ### 不做
 - 不要一次性要求太多（拆成小任务）
 - 不要模糊描述（明确文件和功能）
 - 不要跳过权限确认除非完全信任
 - 不要忽略 Hooks 的自动化潜力
+
+## 十二、智能 Skill 推荐
+
+当用户提问涉及以下场景时，主动调用 **find-skill** 查找并推荐相关 skills：
+
+| 用户问题类型 | 推荐动作 |
+|------------|---------|
+| "有没有做 X 的 skill" | 调用 `find-skill` 搜索 |
+| "如何实现 XXX" | 调用 `find-skill` 查找可能有用的 skills |
+| "XXX 技巧/方法" | 调用 `find-skill` 检查是否有相关 skill |
+| 涉及多个领域 | 调用 `find-skill` 获取多个推荐 |
+
+### 推荐时机
+
+**场景 1：用户明确询问是否有某个 skill**
+```
+用户："有没有自动生成测试的 skill？"
+→ 调用 find-skill: "自动生成测试"
+```
+
+**场景 2：用户描述的需求涉及特定领域**
+```
+用户："我想做一个代码审查工具"
+→ 调用 find-skill: "代码审查" → 推荐 pr-review-toolkit
+```
+
+**场景 3：跨领域复杂任务**
+```
+用户："帮我规划一个电商系统"
+→ enhance-chat-skill 规划
+→ find-skill 查找可能相关的 skills（如有）
+```
+
+### 调用方式
+
+```markdown
+用户问到可能需要其他 skill 的场景时：
+
+"我发现有一个 skill 可能帮到你——让我查一下..."
+（调用 find-skill）
+```
+
+### 已集成的 Skills（自动推荐）
+
+| 领域 | Skill | 触发关键词 |
+|-----|-------|-----------|
+| 代码审查 | `pr-review-toolkit:review-pr` | PR、pull request、审查 |
+| 规划设计 | `enhance-chat-skill` | 规划、设计、需求 |
+| 知识回顾 | `knowledge-review-skill` | 总结、讲解、回顾 |
+| 模型查询 | `models-dev` | 模型、GPT、Claude、参数 |
+| 代码优化 | `simplify` | 优化、简化、重构 |
+| 配置管理 | `update-config` | 配置、settings、hook |
+| 定时任务 | `loop` | 定期、循环、定时 |
+
+### 推荐优先级
+
+1. **直接匹配** → 找到明确对应的 skill，立即推荐
+2. **模糊匹配** → 找到相关 skill，说明可能有用
+3. **无匹配** → 告知用户当前无可用 skill，建议其他方式
 
 ## 十一、输出选项
 
@@ -322,5 +382,6 @@ fi
 ---
 
 ## 更新日志
+- v2.1.0：新增智能 Skill 推荐功能，集成 find-skill 查找相关 skills，自动推荐 pr-review-toolkit、enhance-chat-skill、models-dev 等
 - v2.0.0：新增 `/feature-dev`、`/plugin-dev` 命令，子代理并行处理，Hooks 自动化工作流，MCP 集成
 - v1.0.0：初始版本
