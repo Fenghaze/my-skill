@@ -252,6 +252,24 @@ def sync_all_skills():
     return git_add_commit_push(message)
 
 
+def sync_single_skill(skill_name):
+    """同步单个skill到仓库"""
+    logger.info(f"Syncing single skill: {skill_name}")
+
+    # 复制单个skill到仓库
+    if not copy_skill_to_repo(skill_name):
+        return False
+
+    # 获取所有skills来生成README
+    skills = get_all_skills()
+    generate_readme(skills)
+
+    # Git提交
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message = f"Update skill: {skill_name} - {timestamp}"
+    return git_add_commit_push(message)
+
+
 def extract_section(content, section_name):
     """提取指定section的内容"""
     lines = content.split('\n')
@@ -395,7 +413,7 @@ class SkillHandler(FileSystemEventHandler):
                     break
 
     def trigger_sync(self, skill_name):
-        """触发同步（带防抖）"""
+        """触发同步（带防抖和用户确认）"""
         current_time = time.time() * 1000
         if current_time - self.last_sync_time < self.debounce_ms:
             logger.info(f"Debouncing sync for {skill_name}")
@@ -404,8 +422,51 @@ class SkillHandler(FileSystemEventHandler):
         self.last_sync_time = current_time
         self.pending_sync = False
 
-        logger.info(f"Syncing skill: {skill_name}")
-        sync_all_skills()
+        logger.info(f"Detected change in skill: {skill_name}")
+
+        # 询问用户是否上传
+        try:
+            response = input(f"\n[auto-upload-skill] Skill '{skill_name}' 已更新，是否上传到 GitHub？[Y/n]: ").strip().lower()
+        except EOFError:
+            logger.info("No terminal input available, skipping upload")
+            return
+
+        if response == 'n':
+            logger.info("Upload skipped by user")
+            # 询问是否继续监视
+            try:
+                continue_response = input(f"[auto-upload-skill] 是否继续监视其他变化？[y/N]: ").strip().lower()
+            except EOFError:
+                continue_response = 'n'
+
+            if continue_response != 'y':
+                logger.info("Stopping watcher as requested by user")
+                # 通过设置一个标志来停止watcher
+                self.stop_watcher = True
+            return
+
+        # 执行同步
+        logger.info(f"Uploading skill: {skill_name}")
+        success = sync_single_skill(skill_name)
+
+        if success:
+            print(f"[auto-upload-skill] ✓ Skill '{skill_name}' 已成功上传到 GitHub")
+        else:
+            print(f"[auto-upload-skill] ✗ Skill '{skill_name}' 上传失败，请查看日志")
+
+        # 询问是否继续监视
+        try:
+            continue_response = input(f"[auto-upload-skill] 是否继续监视其他变化？[y/N]: ").strip().lower()
+        except EOFError:
+            continue_response = 'n'
+
+        if continue_response != 'y':
+            logger.info("Stopping watcher as requested by user")
+            self.stop_watcher = True
+
+    def stop_watcher_request(self):
+        """请求停止watcher"""
+        self.stop_watcher = True
 
 
 def start_watcher():
@@ -419,38 +480,90 @@ def start_watcher():
     logger.info(f"Starting watcher on: {skills_dir}")
 
     event_handler = SkillHandler()
+    event_handler.stop_watcher = False
     observer = Observer()
     observer.schedule(event_handler, skills_dir, recursive=True)
     observer.start()
 
     try:
-        while True:
+        while not event_handler.stop_watcher:
             time.sleep(1)
     except KeyboardInterrupt:
         logger.info("Stopping watcher...")
-        observer.stop()
+        event_handler.stop_watcher = True
+    observer.stop()
     observer.join()
+    logger.info("Watcher stopped")
+
+
+# ============ 定时同步 ============
+def ensure_repo():
+    """确保git仓库存在"""
+    repo_dir = Path(CONFIG["repoDir"])
+    if not repo_dir.exists():
+        logger.info(f"Cloning repository to {repo_dir}")
+        os.makedirs(repo_dir, exist_ok=True)
+        rc, stdout, stderr = run_git(f"git clone https://github.com/{CONFIG['githubRepo']}.git .", cwd=repo_dir)
+        if rc != 0:
+            logger.error(f"Failed to clone repo: {stderr}")
+            return False
+    return True
+
+
+def run_scheduled_sync(interval_hours=24):
+    """定时同步所有skills"""
+    interval_seconds = interval_hours * 3600
+    logger.info(f"Starting scheduled sync every {interval_hours} hours")
+
+    # 首次同步
+    logger.info("Running initial sync...")
+    if not ensure_repo():
+        return
+    sync_all_skills()
+
+    next_sync_time = time.time() + interval_seconds
+    logger.info(f"Next sync scheduled at: {datetime.fromtimestamp(next_sync_time).strftime('%Y-%m-%d %H:%M:%S')}")
+
+    while True:
+        try:
+            time.sleep(10)  # 每10秒检查一次
+
+            current_time = time.time()
+            if current_time >= next_sync_time:
+                logger.info("Scheduled sync triggered")
+                sync_all_skills()
+                next_sync_time = current_time + interval_seconds
+                logger.info(f"Next sync scheduled at: {datetime.fromtimestamp(next_sync_time).strftime('%Y-%m-%d %H:%M:%S')}")
+
+        except KeyboardInterrupt:
+            logger.info("Stopping scheduled sync...")
+            break
+
+    logger.info("Scheduled sync stopped")
 
 
 # ============ 主程序 ============
 def main():
     parser = argparse.ArgumentParser(description='Auto Upload Skill Sync')
-    parser.add_argument('--daemon', action='store_true', help='Run as daemon')
+    parser.add_argument('--daemon', action='store_true', help='交互式文件监视模式')
+    parser.add_argument('--schedule', action='store_true', help='定时自动同步模式')
+    parser.add_argument('--interval', type=int, default=24, help='定时同步间隔（小时），默认24小时')
     args = parser.parse_args()
 
     setup_logging()
 
     if args.daemon:
         logger.info("Starting sync daemon...")
-        # 确保repo存在
-        repo_dir = Path(CONFIG["repoDir"])
-        if not repo_dir.exists():
-            logger.info(f"Cloning repository to {repo_dir}")
-            os.makedirs(repo_dir, exist_ok=True)
-            run_git(f"git clone https://github.com/{CONFIG['githubRepo']}.git .", cwd=repo_dir)
+        if not ensure_repo():
+            sys.exit(1)
         start_watcher()
+    elif args.schedule:
+        logger.info(f"Starting scheduled sync with {args.interval} hour interval...")
+        run_scheduled_sync(args.interval)
     else:
         logger.info("Running single sync...")
+        if not ensure_repo():
+            sys.exit(1)
         success = sync_all_skills()
         sys.exit(0 if success else 1)
 

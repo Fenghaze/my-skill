@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-03 12:20:58
+自动化skill同步仓库 - 最后更新时间: 2026-04-05 10:22:05
 
 ## Skills
 
@@ -15,10 +15,28 @@
 pip install -r C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/requirements.txt
 ```
 
-**启动同步服务（daemon模式）：**
+**启动定时自动同步（每24小时）：**
+```bash
+python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py --schedule
+```
+
+**启动定时自动同步（自定义间隔）：**
+```bash
+python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py --schedule --interval 12
+```
+自定义间隔单位为小时，例如 `--interval 12` 表示每12小时同步一次。
+
+**启动交互式监视：**
 ```bash
 python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py --daemon
 ```
+
+当检测到skill变化时，会提示：
+```
+[auto-upload-skill] Skill 'xxx' 已更新，是否上传到 GitHub？[Y/n]:
+```
+- 输入 `Y` 或回车：上传并继续监视
+- 输入 `n`：跳过上传，询问是否继续监视
 
 **手动同步所有skills：**
 ```bash
