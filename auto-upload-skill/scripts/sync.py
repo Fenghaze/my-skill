@@ -28,6 +28,7 @@ def load_config():
             return json.load(f)
     return {
         "skillsDir": os.path.expanduser("~/.claude/skills"),
+        "commandsDir": os.path.expanduser("~/.claude/commands"),
         "repoDir": os.path.expanduser("~/.claude/skills-sync-repo"),
         "githubRepo": "Fenghaze/my-skill",
         "branch": "main",
@@ -120,6 +121,41 @@ def get_all_skills():
                 logger.warning(f"Failed to parse {skill_path.name}/SKILL.md: {e}")
 
     return skills
+
+
+def get_all_commands():
+    """获取所有command文件信息"""
+    commands_dir = Path(CONFIG["commandsDir"])
+    commands = []
+
+    if not commands_dir.exists():
+        return commands
+
+    for cmd_path in commands_dir.iterdir():
+        if cmd_path.is_file() and not is_excluded(str(cmd_path)):
+            cmd_info = {
+                'name': cmd_path.name,
+                'path': str(cmd_path),
+                'description': ''
+            }
+            # 尝试读取文件前几行作为描述
+            try:
+                content = cmd_path.read_text(encoding='utf-8', errors='ignore')
+                lines = content.split('\n')
+                # 取第一行非空行作为描述
+                for line in lines:
+                    stripped = line.strip()
+                    if stripped and not stripped.startswith('#'):
+                        cmd_info['description'] = stripped[:100]
+                        break
+                    elif stripped.startswith('#'):
+                        # 跳过注释行，继续找
+                        continue
+            except Exception as e:
+                logger.warning(f"Failed to read {cmd_path.name}: {e}")
+            commands.append(cmd_info)
+
+    return commands
 
 
 def parse_skill_md(content):
@@ -289,8 +325,36 @@ def copy_skill_to_repo(skill_name):
     return True
 
 
-def sync_all_skills():
-    """同步所有skills到仓库"""
+def copy_command_to_repo(cmd_name):
+    """复制command到git仓库的commands目录"""
+    commands_dir = Path(CONFIG["commandsDir"])
+    repo_dir = Path(CONFIG["repoDir"])
+
+    src = commands_dir / cmd_name
+    dst = repo_dir / "commands" / cmd_name
+
+    if not src.exists():
+        logger.warning(f"Command {cmd_name} not found in {commands_dir}")
+        return False
+
+    # 删除旧版本
+    if dst.exists():
+        shutil.rmtree(dst)
+
+    # 复制文件（排除敏感文件）
+    if is_excluded(str(src)):
+        logger.info(f"Skipping excluded command: {cmd_name}")
+        return False
+
+    os.makedirs(dst.parent, exist_ok=True)
+    shutil.copy2(src, dst)
+
+    logger.info(f"Copied command '{cmd_name}' to repo")
+    return True
+
+
+def sync_all():
+    """同步所有skills和commands到仓库"""
     skills = get_all_skills()
     logger.info(f"Found {len(skills)} skills to sync")
 
@@ -298,12 +362,25 @@ def sync_all_skills():
     for skill in skills:
         copy_skill_to_repo(skill['name'])
 
+    # 同步commands
+    commands = get_all_commands()
+    logger.info(f"Found {len(commands)} commands to sync")
+
+    # 删除旧的commands目录，重新同步
+    repo_dir = Path(CONFIG["repoDir"])
+    commands_repo_dir = repo_dir / "commands"
+    if commands_repo_dir.exists():
+        shutil.rmtree(commands_repo_dir)
+
+    for cmd in commands:
+        copy_command_to_repo(cmd['name'])
+
     # 生成README
-    generate_readme(skills)
+    generate_readme(skills, commands)
 
     # Git提交
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    message = f"Sync skills - {timestamp}"
+    message = f"Sync skills and commands - {timestamp}"
     return git_add_commit_push(message)
 
 
@@ -317,11 +394,31 @@ def sync_single_skill(skill_name):
 
     # 获取所有skills来生成README
     skills = get_all_skills()
-    generate_readme(skills)
+    commands = get_all_commands()
+    generate_readme(skills, commands)
 
     # Git提交
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     message = f"Update skill: {skill_name} - {timestamp}"
+    return git_add_commit_push(message)
+
+
+def sync_single_command(cmd_name):
+    """同步单个command到仓库"""
+    logger.info(f"Syncing single command: {cmd_name}")
+
+    # 复制单个command到仓库
+    if not copy_command_to_repo(cmd_name):
+        return False
+
+    # 获取所有skills和commands来生成README
+    skills = get_all_skills()
+    commands = get_all_commands()
+    generate_readme(skills, commands)
+
+    # Git提交
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message = f"Update command: {cmd_name} - {timestamp}"
     return git_add_commit_push(message)
 
 
@@ -378,8 +475,10 @@ def get_usage_content(skill_md_path):
     return usage
 
 
-def generate_readme(skills):
+def generate_readme(skills, commands=None):
     """生成仓库README.md"""
+    if commands is None:
+        commands = []
     repo_dir = Path(CONFIG["repoDir"])
     github_repo = CONFIG["githubRepo"]
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -416,6 +515,19 @@ def generate_readme(skills):
 
         skills_lines.append("")
 
+    # Commands部分
+    commands_lines = []
+    if commands:
+        commands_lines.append("## Commands")
+        commands_lines.append("")
+        commands_lines.append("| 命令 | 描述 |")
+        commands_lines.append("|------|------|")
+        for cmd in commands:
+            name = cmd.get('name', '')
+            desc = cmd.get('description', '')
+            commands_lines.append(f"| `{name}` | {desc} |")
+        commands_lines.append("")
+
     readme_content = f"""# My Skills
 
 自动化skill同步仓库 - 最后更新时间: {timestamp}
@@ -424,6 +536,7 @@ def generate_readme(skills):
 
 {chr(10).join(skills_lines)}
 
+{chr(10).join(commands_lines)}
 ---
 _Generated by auto-upload-skill_
 """
@@ -445,8 +558,16 @@ class SkillHandler(FileSystemEventHandler):
         if event.is_directory:
             return
 
-        # 只关心SKILL.md文件
-        if not event.src_path.endswith('/SKILL.md') and not event.src_path.endswith('\\SKILL.md'):
+        # 检查是skill还是command
+        skills_dir = CONFIG["skillsDir"].replace('\\', '/')
+        commands_dir = CONFIG["commandsDir"].replace('\\', '/')
+
+        # 只关心SKILL.md文件或commands目录下的文件
+        is_skill = event.src_path.endswith('/SKILL.md') or event.src_path.endswith('\\SKILL.md')
+        is_command = event.src_path.startswith(skills_dir) or event.src_path.startswith(commands_dir)
+
+        if not (is_skill or (is_command and not is_skill)):
+            # 如果不是SKILL.md，也不是commands目录下的文件，则忽略
             return
 
         # 忽略auto-upload-skill自身的SKILL.md
@@ -455,33 +576,46 @@ class SkillHandler(FileSystemEventHandler):
 
         logger.info(f"Detected change: {event.src_path} ({event.event_type})")
 
-        # 提取skill名称
-        skills_dir = CONFIG["skillsDir"].replace('\\', '/')
-        if '/' in event.src_path:
-            parts = event.src_path.split('/')
-            for i, part in enumerate(parts):
-                if part == 'skills' and i + 1 < len(parts):
-                    skill_name = parts[i + 1]
-                    if skill_name != 'auto-upload-skill':
+        # 提取skill或command名称
+        if is_skill:
+            if '/' in event.src_path:
+                parts = event.src_path.split('/')
+                for i, part in enumerate(parts):
+                    if part == 'skills' and i + 1 < len(parts):
+                        skill_name = parts[i + 1]
+                        if skill_name != 'auto-upload-skill':
+                            self.pending_sync = True
+                            self.trigger_sync(skill_name=skill_name)
+                        break
+        else:
+            # command文件变化
+            if '/' in event.src_path:
+                parts = event.src_path.split('/')
+                for i, part in enumerate(parts):
+                    if part == 'commands' and i + 1 < len(parts):
+                        cmd_name = parts[i + 1]
                         self.pending_sync = True
-                        self.trigger_sync(skill_name)
-                    break
+                        self.trigger_sync(cmd_name=cmd_name)
+                        break
 
-    def trigger_sync(self, skill_name):
+    def trigger_sync(self, skill_name=None, cmd_name=None):
         """触发同步（带防抖和用户确认）"""
         current_time = time.time() * 1000
+        name = skill_name or cmd_name
+        item_type = "Skill" if skill_name else "Command"
+
         if current_time - self.last_sync_time < self.debounce_ms:
-            logger.info(f"Debouncing sync for {skill_name}")
+            logger.info(f"Debouncing sync for {name}")
             return
 
         self.last_sync_time = current_time
         self.pending_sync = False
 
-        logger.info(f"Detected change in skill: {skill_name}")
+        logger.info(f"Detected change in {item_type.lower()}: {name}")
 
         # 询问用户是否上传
         try:
-            response = input(f"\n[auto-upload-skill] Skill '{skill_name}' 已更新，是否上传到 GitHub？[Y/n]: ").strip().lower()
+            response = input(f"\n[auto-upload-skill] {item_type} '{name}' 已更新，是否上传到 GitHub？[Y/n]: ").strip().lower()
         except EOFError:
             logger.info("No terminal input available, skipping upload")
             return
@@ -501,13 +635,19 @@ class SkillHandler(FileSystemEventHandler):
             return
 
         # 执行同步
-        logger.info(f"Uploading skill: {skill_name}")
-        success = sync_single_skill(skill_name)
+        if skill_name:
+            logger.info(f"Uploading skill: {skill_name}")
+            success = sync_single_skill(skill_name)
+            item_name = skill_name
+        else:
+            logger.info(f"Uploading command: {cmd_name}")
+            success = sync_single_command(cmd_name)
+            item_name = cmd_name
 
         if success:
-            print(f"[auto-upload-skill] ✓ Skill '{skill_name}' 已成功上传到 GitHub")
+            print(f"[auto-upload-skill] ✓ {item_type} '{item_name}' 已成功上传到 GitHub")
         else:
-            print(f"[auto-upload-skill] ✗ Skill '{skill_name}' 上传失败，请查看日志")
+            print(f"[auto-upload-skill] ✗ {item_type} '{item_name}' 上传失败，请查看日志")
 
         # 询问是否继续监视
         try:
@@ -527,17 +667,22 @@ class SkillHandler(FileSystemEventHandler):
 def start_watcher():
     """启动文件监视"""
     skills_dir = CONFIG["skillsDir"]
+    commands_dir = CONFIG["commandsDir"]
 
     if not os.path.exists(skills_dir):
         logger.error(f"Skills directory not found: {skills_dir}")
         return
 
     logger.info(f"Starting watcher on: {skills_dir}")
+    if os.path.exists(commands_dir):
+        logger.info(f"Starting watcher on: {commands_dir}")
 
     event_handler = SkillHandler()
     event_handler.stop_watcher = False
     observer = Observer()
     observer.schedule(event_handler, skills_dir, recursive=True)
+    if os.path.exists(commands_dir):
+        observer.schedule(event_handler, commands_dir, recursive=False)
     observer.start()
 
     try:
@@ -574,7 +719,7 @@ def run_scheduled_sync(interval_hours=24):
     logger.info("Running initial sync...")
     if not ensure_repo():
         return
-    sync_all_skills()
+    sync_all()
 
     next_sync_time = time.time() + interval_seconds
     logger.info(f"Next sync scheduled at: {datetime.fromtimestamp(next_sync_time).strftime('%Y-%m-%d %H:%M:%S')}")
@@ -586,7 +731,7 @@ def run_scheduled_sync(interval_hours=24):
             current_time = time.time()
             if current_time >= next_sync_time:
                 logger.info("Scheduled sync triggered")
-                sync_all_skills()
+                sync_all()
                 next_sync_time = current_time + interval_seconds
                 logger.info(f"Next sync scheduled at: {datetime.fromtimestamp(next_sync_time).strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -619,7 +764,7 @@ def main():
         logger.info("Running single sync...")
         if not ensure_repo():
             sys.exit(1)
-        success = sync_all_skills()
+        success = sync_all()
         sys.exit(0 if success else 1)
 
 

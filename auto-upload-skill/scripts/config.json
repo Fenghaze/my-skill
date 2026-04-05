@@ -1,5 +1,6 @@
 {
   "skillsDir": "C:/Users/Administrator/.claude/skills",
+  "commandsDir": "C:/Users/Administrator/.claude/commands",
   "repoDir": "C:/Users/Administrator/.claude/skills-sync-repo",
   "githubRepo": "Fenghaze/my-skill",
   "branch": "main",
