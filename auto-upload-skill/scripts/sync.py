@@ -163,9 +163,9 @@ def get_all_commands():
                             cmd_info['description'] = stripped[:100]
                         break
 
-                # 取前20行作为内容预览
+                # 取前30行作为内容预览
                 preview_lines = []
-                for line in lines[:20]:
+                for line in lines[:30]:
                     # 跳过shebang行
                     if line.strip().startswith('#!/'):
                         preview_lines.append(f"# {line.strip()}")
@@ -552,21 +552,26 @@ def generate_readme(skills, commands=None):
             # 从preview提取效果示例
             effect = ""
             preview_lines = preview.split('\n')
-            for line in reversed(preview_lines):
+            for line in preview_lines:
                 stripped = line.strip()
-                # 找包含@username或cwd_display的关键输出行
-                if '@username' in stripped or 'cwd_display' in stripped:
-                    # 提取print语句内容
-                    if 'print' in stripped:
-                        # 去掉print( 和结尾的 )
-                        start = stripped.find('print(') + 6
-                        end = stripped.rfind(')')
-                        if start > 5 and end > start:
-                            raw = stripped[start:end].strip('\'\"')
-                            # 清理转义序列和变量
-                            effect = raw.replace(f'\\033[{', '').replace('}]', '').replace('}', '').replace('{', '')
-                    else:
-                        effect = stripped[:60]
+                # 找print语句
+                if 'print' in stripped and '@username' in stripped:
+                    # 提取f-string内容（处理转义引号）
+                    raw = stripped[stripped.find('print'):]
+                    # 找到f'或f"之后的内容
+                    for quote in ["f'", 'f"']:
+                        qpos = raw.find(quote)
+                        if qpos != -1:
+                            raw = raw[qpos+2:]  # 跳过f和第一个引号
+                            # 找配对的结束引号
+                            parts = raw.rsplit('\'', 1) if quote == "f'" else raw.rsplit('"', 1)
+                            if len(parts) > 1:
+                                raw = parts[0]
+                            # 清理转义序列
+                            effect = raw.replace('\\033[', '').replace('033[', '').replace('m', '').replace('\\', '')
+                            effect = effect.replace('{', '').replace('}', '')[:60]
+                            break
+                if effect:
                     break
 
             # 兜底：直接用描述
