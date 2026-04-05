@@ -1,17 +1,18 @@
 #!/bin/bash
-# Claude Code Status Line Plugin
-# 格式: 工作目录:[模型|风格|Ctx:%|模式]
+# Claude Code 状态栏插件
+# 功能: 显示当前用户、目录、模型、输出风格、权限模式和上下文使用率
+# 效果: @username cwd:[model|style|mode](context%)
 
 /d/Miniconda/python.exe -c "
 import sys, json, subprocess
 
 MODE_LABELS = {
-    'default': '\033[33mask\033[0m',
-    'acceptEdits': '\033[32macceptEdits\033[0m',
-    'auto': '\033[32mauto\033[0m',
-    'dontAsk': '\033[31mdontAsk\033[0m',
-    'plan': '\033[36mplan\033[0m',
-    'bypassPermissions': '\033[35mbypass\033[0m',
+    'default': 'ask',
+    'acceptEdits': 'acceptEdits',
+    'auto': 'auto',
+    'dontAsk': 'dontAsk',
+    'plan': 'plan',
+    'bypassPermissions': 'bypass',
 }
 
 try:
@@ -37,10 +38,10 @@ try:
         style_name = 'default'
 
     tool_mode = data.get('permission_mode', 'default')
-    mode_label = MODE_LABELS.get(tool_mode, f'\033[33m{tool_mode}\033[0m')
+    mode_label = MODE_LABELS.get(tool_mode, tool_mode)
 
-    print(f'\033[33m@{username}\033[0m \033[36m{cwd_display}\033[0m:[\033[33m{model_display}\033[0m|\033[35m{style_name}\033[0m|{mode_label}]\033[32m({context_info})\033[0m')
+    print(f'@{username} {cwd_display}:[{model_display}|{style_name}|{mode_label}]({context_info})')
 
 except Exception:
-    print(f'\033[33m@\033[0m \033[36m?\033[0m:[\033[31mError\033[0m|\033[33mdefault\033[0m]\033[32m(100%)\033[0m')
+    print(f'@? ?:[?|default|?](100%)')
 "
