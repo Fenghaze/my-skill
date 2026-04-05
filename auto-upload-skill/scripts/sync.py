@@ -552,29 +552,16 @@ def generate_readme(skills, commands=None):
             # 从preview提取效果示例
             effect = ""
             preview_lines = preview.split('\n')
-            i = 0
-            while i < len(preview_lines):
-                stripped = preview_lines[i].strip()
-                # 优先找格式注释：# 格式: ... 或 # 效果: ...
-                if stripped.startswith('#') and ('格式' in stripped or stripped == '# 效果' or stripped == '#效果'):
-                    effect = stripped.lstrip('#').strip()
-                    if effect == '效果' and i + 1 < len(preview_lines):
-                        # 下一行是Python print语句，提取之
-                        next_line = preview_lines[i + 1].strip()
-                        if 'print' in next_line and '@username' in next_line:
-                            raw = next_line[next_line.find('print'):]
-                            for quote in ["f'", 'f"']:
-                                qpos = raw.find(quote)
-                                if qpos != -1:
-                                    raw = raw[qpos+2:]
-                                    parts = raw.rsplit('\'', 1) if quote == "f'" else raw.rsplit('"', 1)
-                                    if len(parts) > 1:
-                                        raw = parts[0]
-                                    effect = raw.replace('\\033[', '').replace('033[', '').replace('m', '').replace('\\', '')
-                                    effect = effect.replace('{', '').replace('}', '')[:60]
-                                    break
-                    break
-                i += 1
+            for line in preview_lines:
+                stripped = line.strip()
+                # 找效果示例注释：# 效果示例: ... 或 # 效果: ...
+                if stripped.startswith('#') and ('效果示例' in stripped or (stripped.startswith('# 效果:') and len(stripped) > 5)):
+                    raw = stripped.lstrip('#').strip()
+                    if ':' in raw:
+                        parts = raw.split(':', 1)
+                        if len(parts) > 1 and parts[1].strip():
+                            effect = parts[1].strip()[:60]
+                            break
 
             # 兜底：直接用描述
             if not effect:
