@@ -1,7 +1,7 @@
 #!/bin/bash
 # Claude Code 状态栏插件
-# 功能: 显示当前用户、目录、模型、输出风格、权限模式和上下文使用率
-# 效果
+# 功能: 显示用户、目录、模型、风格、权限模式和上下文使用率
+# 效果示例: @fenghaze /d/coding:[claude-sonnet-4-6|Explanatory|auto](83%)
 
 /d/Miniconda/python.exe -c "
 import sys, json, subprocess
