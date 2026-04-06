@@ -1,6 +1,6 @@
 # My Skills
 
-自动化skill同步仓库 - 最后更新时间: 2026-04-05 16:52:34
+自动化skill同步仓库 - 最后更新时间: 2026-04-06 10:55:35
 
 ## Skills
 
@@ -51,14 +51,37 @@ python C:/Users/Administrator/.claude/skills/auto-upload-skill/scripts/sync.py
 **描述：** "Claude Code 使用技巧与 AI Agent 实战助手。当用户询问上下文管理、会话优化、项目交接、最佳实践等问题时自动触发。注意：当用户有功能需求时，应先调用 enhance-chat-skill 进行规划，再用本 skill 提供技巧指导。提供 slash commands、Hooks、MCP、子代理等实战技巧，并智能推荐/创建相关 skills 帮助用户高效使用 AI 进行项目开发。"
 
 
-### enhance-chat-skill
-**描述：** 增强型规划技能，使用设计树方法论进行严谨的软件设计。**当用户制定任何功能计划、进行需求分析、或者使用 /plan 命令时，必须调用此技能**。无论是简单的功能实现还是复杂的系统设计，都应先通过此技能进行颗粒度对齐和严谨的需求收集，确保后续实现的准确性。
+### e2e-testing-automation
+**描述：** Build end-to-end automated tests that simulate real user interactions across the full application stack. Use for E2E test, Selenium, Cypress, Playwright, browser automation, and user journey testing. **IMPORTANT: When this skill is triggered, you MUST use the Agent tool to launch a sub-agent to execute all E2E test tasks. Never run tests directly in the parent agent context — always delegate to a background sub-agent.**
 
 **使用方法：**
-当以下情况时自动触发此技能：
-1. 用户进入规划模式进行软件设计任务
-2. 用户请求功能或系统的实施规划
-3. 用户询问架构设计或系统规划
+- Testing critical user journeys (signup, checkout, login)
+- Validating multi-step workflows
+- Testing across different browsers and devices
+- Regression testing for UI changes
+- Verifying frontend-backend integration
+- Testing with real user interactions (clicks, typing, scrolling)
+- Smoke testing deployments
+
+### enhance-chat-skill
+**描述：** 增强型规划技能，使用设计树方法论进行严谨的软件设计。**凡涉及功能相关的请求（如新增功能、修改功能、删除功能、功能优化、bug修复等），一律先调用此技能进行颗粒度对齐和需求收集**，确保后续实现的准确性。禁止在未经此技能进行需求分析前直接开始实现代码。
+
+**使用方法：**
+**强制触发规则：凡涉及功能相关的请求，一律先调用此技能。**
+
+包括但不限于：
+1. 用户请求新增功能（如"添加XX功能"、"实现XX"）
+2. 用户请求修改或优化现有功能（如"改进XX"、"重构XX"）
+3. 用户请求删除功能（如"移除XX功能"）
+4. 用户请求修复功能bug（如"XX功能有问题"、"修复XX"）
+5. 用户进入规划模式进行软件设计任务
+6. 用户使用 /plan 命令或类似规划命令
+7. 用户询问架构设计或系统规划
+8. **任何需要写代码才能完成的任务请求**（除非是简单的读文件、看代码、查文档）
+
+**禁止行为：**
+- 禁止在未经此技能进行需求分析和颗粒度对齐的情况下直接开始写代码
+- 禁止对模糊需求直接实现，必须先通过此技能澄清
 
 ### find-skill
 **描述：** Help users discover and install AI Agent skills. Automatically triggers when users ask "is there a skill for X", "how to do X with a skill", or want to extend agent capabilities. Supports searching the public skills.sh registry.
